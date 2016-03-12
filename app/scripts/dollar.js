@@ -112,7 +112,7 @@ function Result(name, score) // constructor
 var NumUnistrokes = 2;
 
 var NumPoints = 64;
-var SquareSize = 250.0;
+var SquareSize = 100 * Math.sqrt(2);
 var Origin = new Point(0,0);
 var Diagonal = Math.sqrt(SquareSize * SquareSize + SquareSize * SquareSize);
 var HalfDiagonal = 0.5 * Diagonal;
