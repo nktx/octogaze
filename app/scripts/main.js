@@ -6,7 +6,7 @@ function Point(x, y)
 
 $(function() {
 
-	var menuOn = false;
+	var menuMode = false;
 	var initStart = false;
 	var gesturePath = [];
 
@@ -29,14 +29,14 @@ $(function() {
 
 	$(document).keydown(function(event){ 
 		if (event.keyCode == 90) { 
-			menuOn = true;
+			menuMode = true;
 			$('#menu-status').text('on');
 		}
 	});
 
 	$(document).keyup(function(event){ 
 		if (event.keyCode == 90) { 
-			menuOn = false;
+			menuMode = false;
 			initStart = false;
 			$('#menu-status').text('off');
 			d3.selectAll('.menu-svg path').remove();
