@@ -27,6 +27,11 @@ $(function() {
 						})
 						.interpolate('basis');
 
+	var recognizer = new DollarRecognizer;
+
+	// menu swith
+	// ------------------------------
+
 	$(document).keydown(function(event){ 
 		if (event.keyCode == 90) { 
 			menuMode = true;
@@ -35,17 +40,27 @@ $(function() {
 	});
 
 	$(document).keyup(function(event){ 
-		if (event.keyCode == 90) { 
-			menuMode = false;
-			initStart = false;
+		if (event.keyCode == 90) {
+
 			$('#menu-status').text('off');
 			d3.selectAll('.menu-svg path').remove();
-			console.log(gesturePath);
+
+			var result = recognizer.Recognize(gesturePath);
+			$('#result-name').text(result.Name);
+			$('#result-score').text(result.Score);
+			console.log(result);
+
+			menuMode = false;
+			initStart = false;
+			gesturePath = [];
 		}
 	});
 
+	// gesture path drawing and recording
+	// ------------------------------
+
 	$(document).mousemove(function(e) {
-		if (menuOn) {
+		if (menuMode) {
 			if (!initStart) {
 				startPos = new Point(e.pageX, e.pageY);
 				prevPos = new Point(e.pageX, e.pageY);
