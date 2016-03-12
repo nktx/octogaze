@@ -28,6 +28,14 @@ $(function() {
 						.interpolate('basis');
 
 	var recognizer = new DollarRecognizer;
+	
+	// DOM selection
+	// ------------------------------
+
+	var $menuStaus = $('#menu-status');
+	var $resultName = $('#result-name');
+	var $resultScore = $('#result-score');
+	var $pathLength = $('#path-length');
 
 	// menu swith
 	// ------------------------------
@@ -35,19 +43,19 @@ $(function() {
 	$(document).keydown(function(event){ 
 		if (event.keyCode == 90) { 
 			menuMode = true;
-			$('#menu-status').text('on');
+			$menuStaus.text('on');
 		}
 	});
 
 	$(document).keyup(function(event){ 
 		if (event.keyCode == 90) {
 
-			$('#menu-status').text('off');
+			$menuStaus.text('off');
 			d3.selectAll('.menu-svg path').remove();
 
 			var result = recognizer.Recognize(gesturePath);
-			$('#result-name').text(result.Name);
-			$('#result-score').text(result.Score);
+			$resultName.text(result.Name);
+			$resultScore.text(result.Score);
 			console.log(result);
 
 			menuMode = false;
@@ -69,6 +77,7 @@ $(function() {
 		
 			curPos = new Point(e.pageX, e.pageY);
       gesturePath.push(new Point(curPos.X - startPos.X, curPos.Y - startPos.Y));
+      $pathLength.text(PathLength(gesturePath));
 
       menu.append('path')
 					.attr({
