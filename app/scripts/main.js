@@ -28,7 +28,7 @@ $(function() {
 						.interpolate('basis');
 
 	var recognizer = new DollarRecognizer;
-	
+
 	// DOM selection
 	// ------------------------------
 
@@ -36,6 +36,8 @@ $(function() {
 	var $resultName = $('#result-name');
 	var $resultScore = $('#result-score');
 	var $pathLength = $('#path-length');
+	var $pathAngle = $('#path-angle');
+	var $realtimeStatus = $('#realtime-status');
 
 	// menu swith
 	// ------------------------------
@@ -56,7 +58,6 @@ $(function() {
 			var result = recognizer.Recognize(gesturePath);
 			$resultName.text(result.Name);
 			$resultScore.text(result.Score);
-			console.log(result);
 
 			menuMode = false;
 			initStart = false;
@@ -77,7 +78,11 @@ $(function() {
 		
 			curPos = new Point(e.pageX, e.pageY);
       gesturePath.push(new Point(curPos.X - startPos.X, curPos.Y - startPos.Y));
-      $pathLength.text(PathLength(gesturePath));
+
+      var realtimeData = recognizer.Realtime(gesturePath);
+      $pathLength.text(realtimeData.Length);
+      $pathAngle.text(realtimeData.Angle);
+      $realtimeStatus.text(JSON.stringify(realtimeData.Score));
 
       menu.append('path')
 					.attr({

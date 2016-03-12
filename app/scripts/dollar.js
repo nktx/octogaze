@@ -91,7 +91,7 @@ function Unistroke(name, points) // constructor
 	this.Points = Resample(points, NumPoints);
 	var radians = IndicativeAngle(this.Points);
 	this.Points = RotateBy(this.Points, -radians);
-	this.Points = ScaleTo(this.Points, SquareSize);
+	// this.Points = ScaleTo(this.Points, SquareSize);
 	this.Points = TranslateTo(this.Points, Origin);
 	this.Vector = Vectorize(this.Points); // for Protractor
 	this.Length = PathLength(points);
@@ -112,7 +112,7 @@ function Result(name, score) // constructor
 var NumUnistrokes = 2;
 
 var NumPoints = 64;
-var SquareSize = 100 * Math.sqrt(2);
+var SquareSize = 250.0;
 var Origin = new Point(0,0);
 var Diagonal = Math.sqrt(SquareSize * SquareSize + SquareSize * SquareSize);
 var HalfDiagonal = 0.5 * Diagonal;
@@ -147,10 +147,45 @@ function DollarRecognizer() // constructor
 	
 	this.Unistrokes[0] = new Unistroke("clockwise rectangle", new Array(new Point(0,0), new Point(100,0), new Point(100,100), new Point(0,100), new Point(0,0)));
 	this.Unistrokes[1] = new Unistroke("counterclockwise rectangle", new Array(new Point(0,0), new Point(0,100), new Point(100,100), new Point(100,0), new Point(0,0)));
-
+	
 	//
 	// The $1 Gesture Recognizer API begins here -- 3 methods: Recognize(), AddGesture(), and DeleteUserGestures()
 	//
+	this.Realtime = function(points)
+	{
+		points = Resample(points, NumPoints);
+		var radians = IndicativeAngle(points);
+		points = RotateBy(points, -radians);
+		points = TranslateTo(points, Origin);
+
+		var length = PathLength(points);
+		var angle = IndicativeAngle(points);
+		var score = new Object;
+		
+		for (var i = 0; i < this.Unistrokes.length; i++) {
+			var p = length/PathLength(this.Unistrokes[i].Points);
+			var n = Math.round(this.Unistrokes[i].Points.length * p);
+
+			var sub = this.Unistrokes[i].Points.slice(n);
+			var perf = points.concat(sub);
+
+			perf = Resample(perf, NumPoints);
+			var radians = IndicativeAngle(perf);
+			perf = RotateBy(perf, -radians);
+			perf = TranslateTo(perf, Origin);
+
+			var d = DistanceAtBestAngle(perf, this.Unistrokes[i], -AngleRange, +AngleRange, AnglePrecision);
+			score[this.Unistrokes[i].Name] = 1.0 - d / HalfDiagonal;
+		}
+
+		var data = {
+			Length: length,
+			Angle: angle,
+			Score: score
+		};
+
+		return data;
+	};
 	this.Recognize = function(points, useProtractor)
 	{
 		points = Resample(points, NumPoints);
