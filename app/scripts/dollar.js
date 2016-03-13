@@ -90,9 +90,9 @@ function Unistroke(name, points) // constructor
 	this.Name = name;
 	this.Points = Resample(points, NumPoints);
 	var radians = IndicativeAngle(this.Points);
-	this.Points = RotateBy(this.Points, -radians);
+	// this.Points = RotateBy(this.Points, -radians);
 	// this.Points = ScaleTo(this.Points, SquareSize);
-	this.Points = TranslateTo(this.Points, Origin);
+	// this.Points = TranslateTo(this.Points, Origin);
 	this.Vector = Vectorize(this.Points); // for Protractor
 	this.Length = PathLength(points);
 }
@@ -145,8 +145,10 @@ function DollarRecognizer() // constructor
 	// this.Unistrokes[14] = new Unistroke("star", new Array(new Point(75,250),new Point(75,247),new Point(77,244),new Point(78,242),new Point(79,239),new Point(80,237),new Point(82,234),new Point(82,232),new Point(84,229),new Point(85,225),new Point(87,222),new Point(88,219),new Point(89,216),new Point(91,212),new Point(92,208),new Point(94,204),new Point(95,201),new Point(96,196),new Point(97,194),new Point(98,191),new Point(100,185),new Point(102,178),new Point(104,173),new Point(104,171),new Point(105,164),new Point(106,158),new Point(107,156),new Point(107,152),new Point(108,145),new Point(109,141),new Point(110,139),new Point(112,133),new Point(113,131),new Point(116,127),new Point(117,125),new Point(119,122),new Point(121,121),new Point(123,120),new Point(125,122),new Point(125,125),new Point(127,130),new Point(128,133),new Point(131,143),new Point(136,153),new Point(140,163),new Point(144,172),new Point(145,175),new Point(151,189),new Point(156,201),new Point(161,213),new Point(166,225),new Point(169,233),new Point(171,236),new Point(174,243),new Point(177,247),new Point(178,249),new Point(179,251),new Point(180,253),new Point(180,255),new Point(179,257),new Point(177,257),new Point(174,255),new Point(169,250),new Point(164,247),new Point(160,245),new Point(149,238),new Point(138,230),new Point(127,221),new Point(124,220),new Point(112,212),new Point(110,210),new Point(96,201),new Point(84,195),new Point(74,190),new Point(64,182),new Point(55,175),new Point(51,172),new Point(49,170),new Point(51,169),new Point(56,169),new Point(66,169),new Point(78,168),new Point(92,166),new Point(107,164),new Point(123,161),new Point(140,162),new Point(156,162),new Point(171,160),new Point(173,160),new Point(186,160),new Point(195,160),new Point(198,161),new Point(203,163),new Point(208,163),new Point(206,164),new Point(200,167),new Point(187,172),new Point(174,179),new Point(172,181),new Point(153,192),new Point(137,201),new Point(123,211),new Point(112,220),new Point(99,229),new Point(90,237),new Point(80,244),new Point(73,250),new Point(69,254),new Point(69,252)));
 	// this.Unistrokes[15] = new Unistroke("pigtail", new Array(new Point(81,219),new Point(84,218),new Point(86,220),new Point(88,220),new Point(90,220),new Point(92,219),new Point(95,220),new Point(97,219),new Point(99,220),new Point(102,218),new Point(105,217),new Point(107,216),new Point(110,216),new Point(113,214),new Point(116,212),new Point(118,210),new Point(121,208),new Point(124,205),new Point(126,202),new Point(129,199),new Point(132,196),new Point(136,191),new Point(139,187),new Point(142,182),new Point(144,179),new Point(146,174),new Point(148,170),new Point(149,168),new Point(151,162),new Point(152,160),new Point(152,157),new Point(152,155),new Point(152,151),new Point(152,149),new Point(152,146),new Point(149,142),new Point(148,139),new Point(145,137),new Point(141,135),new Point(139,135),new Point(134,136),new Point(130,140),new Point(128,142),new Point(126,145),new Point(122,150),new Point(119,158),new Point(117,163),new Point(115,170),new Point(114,175),new Point(117,184),new Point(120,190),new Point(125,199),new Point(129,203),new Point(133,208),new Point(138,213),new Point(145,215),new Point(155,218),new Point(164,219),new Point(166,219),new Point(177,219),new Point(182,218),new Point(192,216),new Point(196,213),new Point(199,212),new Point(201,211)));
 	
-	this.Unistrokes[0] = new Unistroke("clockwise rectangle", new Array(new Point(0,0), new Point(100,0), new Point(100,100), new Point(0,100), new Point(0,0)));
-	this.Unistrokes[1] = new Unistroke("counterclockwise rectangle", new Array(new Point(0,0), new Point(0,100), new Point(100,100), new Point(100,0), new Point(0,0)));
+	// this.Unistrokes[0] = new Unistroke("clockwise rectangle", new Array(new Point(0,0), new Point(100,0), new Point(100,100), new Point(0,100), new Point(0,0)));
+	// this.Unistrokes[1] = new Unistroke("counterclockwise rectangle", new Array(new Point(0,0), new Point(100,0), new Point(100,-100), new Point(0,-100), new Point(0,0)));
+	this.Unistrokes[0] = new Unistroke("L", new Array(new Point(0,0), new Point(0,100), new Point(100,100)));
+	this.Unistrokes[1] = new Unistroke("Z", new Array(new Point(0,0), new Point(100,0), new Point(0,100), new Point(100,100)));
 	
 	//
 	// The $1 Gesture Recognizer API begins here -- 3 methods: Recognize(), AddGesture(), and DeleteUserGestures()
@@ -154,13 +156,14 @@ function DollarRecognizer() // constructor
 	this.Realtime = function(points)
 	{
 		points = Resample(points, NumPoints);
-		var radians = IndicativeAngle(points);
-		points = RotateBy(points, -radians);
-		points = TranslateTo(points, Origin);
+		// var radians = IndicativeAngle(points);
+		// points = RotateBy(points, -radians);
+		// points = TranslateTo(points, Origin);
 
 		var length = PathLength(points);
 		var angle = IndicativeAngle(points);
 		var score = new Object;
+		var subtract = new Object;
 		
 		for (var i = 0; i < this.Unistrokes.length; i++) {
 			var p = length/PathLength(this.Unistrokes[i].Points);
@@ -170,18 +173,20 @@ function DollarRecognizer() // constructor
 			var perf = points.concat(sub);
 
 			perf = Resample(perf, NumPoints);
-			var radians = IndicativeAngle(perf);
-			perf = RotateBy(perf, -radians);
-			perf = TranslateTo(perf, Origin);
+			// var radians = IndicativeAngle(perf);
+			// perf = RotateBy(perf, -radians);
+			// perf = TranslateTo(perf, Origin);
 
 			var d = DistanceAtBestAngle(perf, this.Unistrokes[i], -AngleRange, +AngleRange, AnglePrecision);
 			score[this.Unistrokes[i].Name] = 1.0 - d / HalfDiagonal;
+			subtract[this.Unistrokes[i].Name] = sub;
 		}
 
 		var data = {
 			Length: length,
 			Angle: angle,
-			Score: score
+			Score: score,
+			Subtract: subtract
 		};
 
 		return data;
@@ -189,10 +194,10 @@ function DollarRecognizer() // constructor
 	this.Recognize = function(points, useProtractor)
 	{
 		points = Resample(points, NumPoints);
-		var radians = IndicativeAngle(points);
-		points = RotateBy(points, -radians);
+		// var radians = IndicativeAngle(points);
+		// points = RotateBy(points, -radians);
 		// points = ScaleTo(points, SquareSize);
-		points = TranslateTo(points, Origin);
+		// points = TranslateTo(points, Origin);
 		var vector = Vectorize(points); // for Protractor
 
 		var b = +Infinity;

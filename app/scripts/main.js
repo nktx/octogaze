@@ -84,6 +84,8 @@ $(function() {
       $pathAngle.text(realtimeData.Angle);
       $realtimeStatus.text(JSON.stringify(realtimeData.Score));
 
+      drawGuidance(realtimeData.Subtract, e.pageX, e.pageY);
+
       menu.append('path')
 					.attr({
 						'd': line([prevPos, curPos]),
@@ -94,5 +96,37 @@ $(function() {
 			prevPos = new Point(curPos.X, curPos.Y);
 		}
 	});
+
+	function drawGuidance(sub, x, y) {
+
+		menu.selectAll('.menu-svg .guidance').remove();
+
+		$.each(sub, function(index, value) {
+			var offsetX = 0;
+			var offsetY = 0;
+
+			if (value[0]) {
+				offsetX = value[0].X;
+				offsetY = value[0].Y;
+			}
+
+			var guide = value.slice(0,10).map(function(element){
+				return {
+					X: element.X + x - offsetX,
+					Y: element.Y + y - offsetY
+				};
+      })
+
+      menu.append('path')
+					.attr({
+						'd': line(guide),
+						'stroke': '#000000',
+						'stroke-width': '15px',
+						'stroke-opacity': '0.3',
+						'class': 'guidance'
+					});
+			
+		});	
+	}
 
 });
