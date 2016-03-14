@@ -32,12 +32,12 @@ $(function() {
 	// DOM selection
 	// ------------------------------
 
-	var $menuStaus = $('#menu-status');
+	var $menuStatus = $('#menu-status');
 	var $resultName = $('#result-name');
 	var $resultScore = $('#result-score');
 	var $pathLength = $('#path-length');
 	var $pathAngle = $('#path-angle');
-	var $realtimeStatus = $('#realtime-status');
+	var $pathStatus = $('#realtime-status');
 
 	// menu swith
 	// ------------------------------
@@ -45,14 +45,14 @@ $(function() {
 	$(document).keydown(function(event){ 
 		if (event.keyCode == 90) { 
 			menuMode = true;
-			$menuStaus.text('on');
+			$menuStatus.text('on');
 		}
 	});
 
 	$(document).keyup(function(event){ 
 		if (event.keyCode == 90) {
 
-			$menuStaus.text('off');
+			$menuStatus.text('off');
 			d3.selectAll('.menu-svg path').remove();
 
 			var result = recognizer.Recognize(gesturePath);
@@ -82,9 +82,17 @@ $(function() {
       var realtimeData = recognizer.Realtime(gesturePath);
       $pathLength.text(realtimeData.Length);
       $pathAngle.text(realtimeData.Angle);
-      $realtimeStatus.text(JSON.stringify(realtimeData.Score));
+      
+			var pathStatus = '';
+			$.each(realtimeData.Status, function(index, value){
+				pathStatus += value.Name;
+				pathStatus += ': ';
+				pathStatus += value.Score;
+				pathStatus += '; ';
+			});
+			$pathStatus.text(pathStatus);
 
-      drawGuidance(realtimeData.Subtract, e.pageX, e.pageY);
+      drawGuidance(realtimeData.Status, e.pageX, e.pageY);
 
       menu.append('path')
 					.attr({
@@ -97,20 +105,20 @@ $(function() {
 		}
 	});
 
-	function drawGuidance(sub, x, y) {
+	function drawGuidance(st, x, y) {
 
 		menu.selectAll('.menu-svg .guidance').remove();
 
-		$.each(sub, function(index, value) {
+		$.each(st, function(index, value) {
 			var offsetX = 0;
 			var offsetY = 0;
 
-			if (value[0]) {
-				offsetX = value[0].X;
-				offsetY = value[0].Y;
+			if (value.Subtract[0]) {
+				offsetX = value.Subtract[0].X;
+				offsetY = value.Subtract[0].Y;
 			}
 
-			var guide = value.slice(0,10).map(function(element){
+			var guide = value.Subtract.slice(0,10).map(function(element){
 				return {
 					X: element.X + x - offsetX,
 					Y: element.Y + y - offsetY
@@ -120,12 +128,11 @@ $(function() {
       menu.append('path')
 					.attr({
 						'd': line(guide),
-						'stroke': '#000000',
+						'stroke': value.Color,
 						'stroke-width': '15px',
 						'stroke-opacity': '0.3',
 						'class': 'guidance'
 					});
-			
 		});	
 	}
 

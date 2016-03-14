@@ -85,7 +85,7 @@ function Rectangle(x, y, width, height) // constructor
 //
 // Unistroke class: a unistroke template
 //
-function Unistroke(name, points) // constructor
+function Unistroke(color, name, points) // constructor
 {
 	this.Name = name;
 	this.Points = Resample(points, NumPoints);
@@ -95,6 +95,7 @@ function Unistroke(name, points) // constructor
 	// this.Points = TranslateTo(this.Points, Origin);
 	this.Vector = Vectorize(this.Points); // for Protractor
 	this.Length = PathLength(points);
+	this.Color = color;
 }
 //
 // Result class
@@ -109,7 +110,7 @@ function Result(name, score) // constructor
 //
 
 // var NumUnistrokes = 16;
-var NumUnistrokes = 2;
+var NumUnistrokes = 4;
 
 var NumPoints = 64;
 var SquareSize = 250.0;
@@ -147,9 +148,13 @@ function DollarRecognizer() // constructor
 	
 	// this.Unistrokes[0] = new Unistroke("clockwise rectangle", new Array(new Point(0,0), new Point(100,0), new Point(100,100), new Point(0,100), new Point(0,0)));
 	// this.Unistrokes[1] = new Unistroke("counterclockwise rectangle", new Array(new Point(0,0), new Point(100,0), new Point(100,-100), new Point(0,-100), new Point(0,0)));
-	this.Unistrokes[0] = new Unistroke("L", new Array(new Point(0,0), new Point(0,100), new Point(100,100)));
-	this.Unistrokes[1] = new Unistroke("Z", new Array(new Point(0,0), new Point(100,0), new Point(0,100), new Point(100,100)));
-	
+	this.Unistrokes[0] = new Unistroke("#E74C3C", "L", new Array(new Point(0,0), new Point(0,SquareSize), new Point(SquareSize,SquareSize)));
+	this.Unistrokes[1] = new Unistroke("#F1C40F", "Z", new Array(new Point(0,0), new Point(SquareSize,0), new Point(0,SquareSize), new Point(SquareSize,SquareSize)));
+	this.Unistrokes[2] = new Unistroke("#2ECC71", "M", new Array(new Point(0,0), new Point(0,SquareSize*(-1)), new Point(SquareSize/2,0), new Point(SquareSize,SquareSize*(-1)), new Point(SquareSize,0)));
+	this.Unistrokes[3] = new Unistroke("#3498DB", "A", new Array(new Point(0,0), new Point(SquareSize/2,SquareSize*(-1)), new Point(SquareSize,0)));
+
+	// colors = ['#E74C3C', '#E67E22', '#F1C40F', '#2ECC71', '#1CC9A8', '#3498DB', '#9B59B6'];
+
 	//
 	// The $1 Gesture Recognizer API begins here -- 3 methods: Recognize(), AddGesture(), and DeleteUserGestures()
 	//
@@ -162,8 +167,7 @@ function DollarRecognizer() // constructor
 
 		var length = PathLength(points);
 		var angle = IndicativeAngle(points);
-		var score = new Object;
-		var subtract = new Object;
+		var status = new Array;
 		
 		for (var i = 0; i < this.Unistrokes.length; i++) {
 			var p = length/PathLength(this.Unistrokes[i].Points);
@@ -178,15 +182,21 @@ function DollarRecognizer() // constructor
 			// perf = TranslateTo(perf, Origin);
 
 			var d = DistanceAtBestAngle(perf, this.Unistrokes[i], -AngleRange, +AngleRange, AnglePrecision);
-			score[this.Unistrokes[i].Name] = 1.0 - d / HalfDiagonal;
-			subtract[this.Unistrokes[i].Name] = sub;
+			
+			var st = {
+				Name: this.Unistrokes[i].Name,
+				Color: this.Unistrokes[i].Color,
+				Score: 1.0 - d / HalfDiagonal,	
+				Subtract: sub
+			};
+
+			status.push(st);
 		}
 
 		var data = {
 			Length: length,
 			Angle: angle,
-			Score: score,
-			Subtract: subtract
+			Status: status
 		};
 
 		return data;
