@@ -29,6 +29,14 @@ $(function() {
 
 	var recognizer = new DollarRecognizer;
 
+	// Guidance constants
+	// ------------------------------
+
+	var StrokeWidth = 20;
+	var StrokeWidthThresold = 5;
+	var StrokeCapacity = 0.5;
+	var StrokeCapacityThresold = 0.3
+
 	// DOM selection
 	// ------------------------------
 
@@ -111,6 +119,8 @@ $(function() {
 
 		menu.selectAll('.menu-svg .guidance').remove();
 
+		var weight = calculateWeight(st);
+
 		$.each(st, function(index, value) {
 			var offsetX = 0;
 			var offsetY = 0;
@@ -131,11 +141,21 @@ $(function() {
 					.attr({
 						'd': line(guide),
 						'stroke': value.Color,
-						'stroke-width': '15px',
-						'stroke-opacity': '0.3',
+						'stroke-width': weight[index]*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
+						'stroke-opacity': weight[index]*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
 						'class': 'guidance'
 					});
 		});	
+	}
+
+	function calculateWeight(st) {
+		var w = new Array;
+
+		$.each(st, function(index, value) {
+			w.push(value.Score);
+		});
+
+		return w;
 	}
 
 });
