@@ -48,6 +48,10 @@ $(function() {
 	var $pathCurrent = $('#path-current');
 	var $pathStatus = $('#realtime-status');
 
+	var guidanceMode = false;
+	var tangentMode = false;
+
+
 	// menu swith
 	// ------------------------------
 
@@ -56,6 +60,15 @@ $(function() {
 			menuMode = true;
 			$menuStatus.text('on');
 		}
+
+		if (event.keyCode == 80) {
+			guidanceMode = !guidanceMode;
+    	$('#guidance-mode').text( guidanceMode ? 'on' : 'off');
+		}
+		
+		if (event.keyCode == 84) {
+			tangentMode = !tangentMode;
+    	$('#tangent-mode').text( tangentMode ? 'on' : 'off');		}
 	});
 
 	$(document).keyup(function(event){ 
@@ -118,6 +131,7 @@ $(function() {
 	function drawGuidance(st, x, y) {
 
 		menu.selectAll('.menu-svg .guidance').remove();
+		menu.selectAll('.menu-svg .tangent').remove();
 
 		var weight = calculateWeight(st);
 
@@ -137,7 +151,22 @@ $(function() {
 				};
       })
 
-      menu.append('path')
+      var tangent = new Array;
+
+      if (guide[1]) {
+      	var deltaX = guide[1].X - guide[0].X;
+				var deltaY = guide[1].Y - guide[0].Y;
+				
+				for (var i = 0; i < 10; i++){
+					tangent.push({
+						X: guide[0].X + deltaX * i,
+						Y: guide[0].Y + deltaY * i
+					});
+				}
+      }
+
+      if (guidanceMode) {
+      	menu.append('path')
 					.attr({
 						'd': line(guide),
 						'stroke': value.Color,
@@ -145,6 +174,19 @@ $(function() {
 						'stroke-opacity': weight[index]*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
 						'class': 'guidance'
 					});
+      }
+
+      if (tangentMode) {
+      	menu.append('path')
+					.attr({
+						'd': line(tangent),
+						'stroke': value.Color,
+						'stroke-width': weight[index]*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
+						'stroke-opacity': weight[index]*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
+						'class': 'tangent'
+					});
+      }
+			
 		});	
 	}
 
