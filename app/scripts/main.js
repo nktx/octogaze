@@ -37,6 +37,7 @@ $(function() {
 	var $resultScore = $('#result-score');
 	var $pathLength = $('#path-length');
 	var $pathAngle = $('#path-angle');
+	var $pathCurrent = $('#path-current');
 	var $pathStatus = $('#realtime-status');
 
 	// menu swith
@@ -82,6 +83,7 @@ $(function() {
       var realtimeData = recognizer.Realtime(gesturePath);
       $pathLength.text(realtimeData.Length);
       $pathAngle.text(realtimeData.Angle);
+      $pathCurrent.text(JSON.stringify(realtimeData.Current));
       
 			var pathStatus = '';
 			$.each(realtimeData.Status, function(index, value){

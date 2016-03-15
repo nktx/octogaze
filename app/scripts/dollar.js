@@ -167,6 +167,7 @@ function DollarRecognizer() // constructor
 
 		var length = PathLength(points);
 		var angle = IndicativeAngle(points);
+		var current = this.Recognize(points);
 		var status = new Array;
 		
 		for (var i = 0; i < this.Unistrokes.length; i++) {
@@ -196,6 +197,7 @@ function DollarRecognizer() // constructor
 		var data = {
 			Length: length,
 			Angle: angle,
+			Current: current,
 			Status: status
 		};
 
