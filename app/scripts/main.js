@@ -8,6 +8,7 @@ $(function() {
 
 	var menuMode = false;
 	var initStart = false;
+	var hasResult = false;
 	var gesturePath = [];
 
 	var curPos, prevPos, startPos;
@@ -29,13 +30,17 @@ $(function() {
 
 	var recognizer = new DollarRecognizer;
 
-	// Guidance constants
+	var guidanceMode = false;
+	var tangentMode = false;
+
+	// Recognizer constants
 	// ------------------------------
 
 	var StrokeWidth = 20;
 	var StrokeWidthThresold = 5;
 	var StrokeCapacity = 0.5;
 	var StrokeCapacityThresold = 0.3
+	var RecognizerThresold = 0.75;
 
 	// DOM selection
 	// ------------------------------
@@ -48,15 +53,11 @@ $(function() {
 	var $pathCurrent = $('#path-current');
 	var $pathStatus = $('#realtime-status');
 
-	var guidanceMode = false;
-	var tangentMode = false;
-
-
 	// menu swith
 	// ------------------------------
 
 	$(document).keydown(function(event){ 
-		if (event.keyCode == 90) { 
+		if (event.keyCode == 90 && !hasResult) { 
 			menuMode = true;
 			$menuStatus.text('on');
 		}
@@ -68,7 +69,8 @@ $(function() {
 		
 		if (event.keyCode == 84) {
 			tangentMode = !tangentMode;
-    	$('#tangent-mode').text( tangentMode ? 'on' : 'off');		}
+    	$('#tangent-mode').text( tangentMode ? 'on' : 'off');
+    }
 	});
 
 	$(document).keyup(function(event){ 
@@ -84,6 +86,8 @@ $(function() {
 			menuMode = false;
 			initStart = false;
 			gesturePath = [];
+
+			hasResult = false;
 		}
 	});
 
@@ -91,7 +95,7 @@ $(function() {
 	// ------------------------------
 
 	$(document).mousemove(function(e) {
-		if (menuMode) {
+		if (menuMode && !hasResult) {
 			if (!initStart) {
 				startPos = new Point(e.pageX, e.pageY);
 				prevPos = new Point(e.pageX, e.pageY);
@@ -121,10 +125,28 @@ $(function() {
 					.attr({
 						'd': line([prevPos, curPos]),
 						'stroke': '#EFEFEF',
-						'stroke-width': '5px'
+						'stroke-width': '3px',
+						'class': 'gesture'
 					});
 
 			prevPos = new Point(curPos.X, curPos.Y);
+
+			if ((realtimeData.Current.Score >= RecognizerThresold) && (realtimeData.Current.Score < 1)) {
+
+				d3.selectAll('.menu-svg .guidance').remove();
+				d3.selectAll('.menu-svg .tangent').remove();
+	
+				d3.selectAll('.menu-svg .gesture')
+					.attr({
+						'stroke': realtimeData.Current.Color
+					});
+
+				var result = recognizer.Recognize(gesturePath);
+				$resultName.text(result.Name);
+				$resultScore.text(result.Score);
+
+				hasResult = true;
+			}
 		}
 	});
 

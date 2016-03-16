@@ -100,8 +100,9 @@ function Unistroke(color, name, points) // constructor
 //
 // Result class
 //
-function Result(name, score) // constructor
+function Result(color, name, score) // constructor
 {
+	this.Color = color;
 	this.Name = name;
 	this.Score = score;
 }
@@ -226,7 +227,7 @@ function DollarRecognizer() // constructor
 				u = i; // unistroke
 			}
 		}
-		return (u == -1) ? new Result("No match.", 0.0) : new Result(this.Unistrokes[u].Name, useProtractor ? 1.0 / b : 1.0 - b / HalfDiagonal);
+		return (u == -1) ? new Result("#EFEFEF", "No match.", 0.0) : new Result(this.Unistrokes[u].Color, this.Unistrokes[u].Name, useProtractor ? 1.0 / b : 1.0 - b / HalfDiagonal);
 	};
 	this.AddGesture = function(name, points)
 	{
