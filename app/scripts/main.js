@@ -6,10 +6,14 @@ function Point(x, y)
 
 $(function() {
 
+	socket = io.connect();
+
 	var menuMode = false;
 	var initStart = false;
 	var hasResult = false;
 	var gesturePath = [];
+
+	var gestureStartTime = 0;
 
 	var curPos, prevPos, startPos;
 
@@ -32,6 +36,7 @@ $(function() {
 
 	var guidanceMode = false;
 	var tangentMode = false;
+	var recordMode = false;
 
 	// Recognizer constants
 	// ------------------------------
@@ -48,6 +53,7 @@ $(function() {
 	var $menuStatus = $('#menu-status');
 	var $resultName = $('#result-name');
 	var $resultScore = $('#result-score');
+	var $resultTime = $('#result-time');
 	var $pathLength = $('#path-length');
 	var $pathAngle = $('#path-angle');
 	var $pathCurrent = $('#path-current');
@@ -71,6 +77,11 @@ $(function() {
 			tangentMode = !tangentMode;
     	$('#tangent-mode').text( tangentMode ? 'on' : 'off');
     }
+
+    if (event.keyCode == 82) {
+			recordMode = !recordMode;
+    	$('#record-mode').text( recordMode ? 'on' : 'off');
+    }
 	});
 
 	$(document).keyup(function(event){ 
@@ -82,6 +93,21 @@ $(function() {
 			var result = recognizer.Recognize(gesturePath);
 			$resultName.text(result.Name);
 			$resultScore.text(result.Score);
+			$resultTime.text(Date.now() - gestureStartTime);
+
+			if (recordMode && hasResult) {
+				
+				var recordData = new Object;
+
+				recordData.Name = result.Name;
+				recordData.Score = result.Score;
+				recordData.Time = Date.now() - gestureStartTime;
+				recordData.Prefix = guidanceMode;
+				recordData.Tangent = tangentMode;
+				recordData.Path = gesturePath;
+
+				socket.emit('record', recordData);
+			}
 
 			menuMode = false;
 			initStart = false;
@@ -99,6 +125,7 @@ $(function() {
 			if (!initStart) {
 				startPos = new Point(e.pageX, e.pageY);
 				prevPos = new Point(e.pageX, e.pageY);
+				gestureStartTime = Date.now();
 				initStart = true;
 			}
 		
