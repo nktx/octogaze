@@ -14,7 +14,6 @@ $(function() {
 	var gesturePath = [];
 
 	var gestureStartTime = 0;
-
 	var curPos, prevPos, startPos;
 
 	var menu = d3.select('body')
@@ -57,7 +56,7 @@ $(function() {
 	var $pathLength = $('#path-length');
 	var $pathAngle = $('#path-angle');
 	var $pathCurrent = $('#path-current');
-	var $pathStatus = $('#realtime-status');
+	var $pathStatus = $('#path-status');
 
 	// menu swith
 	// ------------------------------
@@ -135,7 +134,7 @@ $(function() {
       var realtimeData = recognizer.Realtime(gesturePath);
       $pathLength.text(realtimeData.Length);
       $pathAngle.text(realtimeData.Angle);
-      $pathCurrent.text(JSON.stringify(realtimeData.Current));
+      $pathCurrent.text(realtimeData.Current.Name + ": " + realtimeData.Current.Score);
       
 			var pathStatus = '';
 			$.each(realtimeData.Status, function(index, value){
