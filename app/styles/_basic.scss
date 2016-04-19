@@ -2,13 +2,16 @@
 	font-family: 'Menlo', sans-serif;
 	font-size: 10px;
 	color: #222;
+	margin-top: 10px;
 }
 
 .title {
-	width: 60px;
+	width: 70px;
 	display: inline-block;
 	padding-right: 10px;
 	text-align: right;
+	color: #777;
+	transform: scale(.8);
 }
 
 hr {
