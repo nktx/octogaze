@@ -55,6 +55,8 @@ $(function() {
 	var $resultTime = $('#result-time');
 	var $pathLength = $('#path-length');
 	var $pathAngle = $('#path-angle');
+	var $pathVelo = $('#path-velo');
+	var $pathAccel = $('#path-accel');
 	var $pathCurrent = $('#path-current');
 	var $pathStatus = $('#path-status');
 
@@ -116,6 +118,9 @@ $(function() {
 		}
 	});
 
+	var prevTime = 0;
+	var prevVelo = 0;
+
 	// gesture path drawing and recording
 	// ------------------------------
 
@@ -126,10 +131,21 @@ $(function() {
 				prevPos = new Point(e.pageX, e.pageY);
 				gestureStartTime = Date.now();
 				initStart = true;
+
+				prevTime = Date.now();
 			}
 		
 			curPos = new Point(e.pageX, e.pageY);
       gesturePath.push(new Point(curPos.X - startPos.X, curPos.Y - startPos.Y));
+
+			var timeDuration = Date.now()-prevTime;
+      var curVelo = Distance(curPos, prevPos)*1000/timeDuration;
+			var curAccel = curVelo - prevVelo*1000/timeDuration;
+
+			$pathVelo.text(curVelo);
+			$pathAccel.text(curAccel);
+
+			prevVelo = curVelo;
 
       var realtimeData = recognizer.Realtime(gesturePath);
       $pathLength.text(realtimeData.Length);
@@ -160,8 +176,6 @@ $(function() {
 			if ((realtimeData.Current.Score >= RecognizerThresold) && (realtimeData.Current.Score < 1)) {
 
 				d3.selectAll('.menu-svg .guidance').remove();
-				d3.selectAll('.menu-svg .tangent').remove();
-	
 				d3.selectAll('.menu-svg .gesture')
 					.attr({
 						'stroke': realtimeData.Current.Color
@@ -179,7 +193,6 @@ $(function() {
 	function drawGuidance(st, x, y) {
 
 		menu.selectAll('.menu-svg .guidance').remove();
-		menu.selectAll('.menu-svg .tangent').remove();
 
 		var weight = calculateWeight(st);
 
@@ -221,7 +234,7 @@ $(function() {
 							'stroke': value.Color,
 							'stroke-width': weight[index]*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
 							'stroke-opacity': weight[index]*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
-							'class': 'tangent'
+							'class': 'guidance'
 						});
 	      } else {
 	      	menu.append('path')
