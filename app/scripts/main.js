@@ -64,29 +64,29 @@ $(function() {
 	$(document).keydown(function(event){ 
 		if (event.keyCode == 90 && !hasResult) { 
 			menuMode = true;
-			$menuStatus.text('on');
+			$menuStatus.text('ON');
 		}
 
-		if (event.keyCode == 80) {
+		if (event.keyCode == 71) {
 			guidanceMode = !guidanceMode;
-    	$('#guidance-mode').text( guidanceMode ? 'on' : 'off');
+    	$('#guidance-mode').text( guidanceMode ? 'ON' : 'OFF');
 		}
 		
 		if (event.keyCode == 84) {
 			tangentMode = !tangentMode;
-    	$('#tangent-mode').text( tangentMode ? 'on' : 'off');
+    	$('#tangent-mode').text( tangentMode ? 'ON' : 'OFF');
     }
 
     if (event.keyCode == 82) {
 			recordMode = !recordMode;
-    	$('#record-mode').text( recordMode ? 'on' : 'off');
+    	$('#record-mode').text( recordMode ? 'ON' : 'OFF');
     }
 	});
 
 	$(document).keyup(function(event){ 
 		if (event.keyCode == 90) {
 
-			$menuStatus.text('off');
+			$menuStatus.text('OFF');
 			d3.selectAll('.menu-svg path').remove();
 
 			var result = recognizer.Recognize(gesturePath);
@@ -214,7 +214,17 @@ $(function() {
       }
 
       if (guidanceMode) {
-      	menu.append('path')
+      	if (tangentMode) {
+	      	menu.append('path')
+						.attr({
+							'd': line(tangent),
+							'stroke': value.Color,
+							'stroke-width': weight[index]*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
+							'stroke-opacity': weight[index]*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
+							'class': 'tangent'
+						});
+	      } else {
+	      	menu.append('path')
 					.attr({
 						'd': line(guide),
 						'stroke': value.Color,
@@ -222,19 +232,8 @@ $(function() {
 						'stroke-opacity': weight[index]*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
 						'class': 'guidance'
 					});
-      }
-
-      if (tangentMode) {
-      	menu.append('path')
-					.attr({
-						'd': line(tangent),
-						'stroke': value.Color,
-						'stroke-width': weight[index]*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
-						'stroke-opacity': weight[index]*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
-						'class': 'tangent'
-					});
-      }
-			
+	      }      	
+      }		
 		});	
 	}
 
