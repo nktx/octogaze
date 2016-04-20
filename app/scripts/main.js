@@ -37,7 +37,7 @@ $(function() {
 	var tangentMode = false;
 	var recordMode = false;
 
-	// Recognizer constants
+	// recognizer constants
 	// ------------------------------
 
 	var StrokeWidth = 20;
@@ -45,6 +45,11 @@ $(function() {
 	var StrokeCapacity = 0.5;
 	var StrokeCapacityThresold = 0.3
 	var RecognizerThresold = 0.75;
+
+	// guidance parameters
+	// ------------------------------
+
+	var guidanceRemaining = 5;
 
 	// DOM selection
 	// ------------------------------
@@ -60,7 +65,7 @@ $(function() {
 	var $pathCurrent = $('#path-current');
 	var $pathStatus = $('#path-status');
 
-	// menu swith
+	// menu switch
 	// ------------------------------
 
 	$(document).keydown(function(event){ 
@@ -121,7 +126,7 @@ $(function() {
 	var prevTime = 0;
 	var prevVelo = 0;
 
-	// gesture path drawing and recording
+	// gesture path drawing and recognizing
 	// ------------------------------
 
 	$(document).mousemove(function(e) {
@@ -146,7 +151,7 @@ $(function() {
 			$pathAccel.text(curAccel);
 
 			prevVelo = curVelo;
-
+			
       var realtimeData = recognizer.Realtime(gesturePath);
       $pathLength.text(realtimeData.Length);
       $pathAngle.text(realtimeData.Angle);
@@ -161,7 +166,7 @@ $(function() {
 			});
 			$pathStatus.text(pathStatus);
 
-      drawGuidance(realtimeData.Status, e.pageX, e.pageY);
+      drawGuidance(realtimeData.Status, e.pageX, e.pageY, curVelo, curAccel);
 
       menu.append('path')
 					.attr({
@@ -190,7 +195,7 @@ $(function() {
 		}
 	});
 
-	function drawGuidance(st, x, y) {
+	function drawGuidance(st, x, y, v, a) {
 
 		menu.selectAll('.menu-svg .guidance').remove();
 
@@ -205,7 +210,7 @@ $(function() {
 				offsetY = value.Subtract[0].Y;
 			}
 
-			var guide = value.Subtract.slice(0,10).map(function(element){
+			var guide = value.Subtract.slice(0,guidanceRemaining).map(function(element){
 				return {
 					X: element.X + x - offsetX,
 					Y: element.Y + y - offsetY
@@ -217,13 +222,16 @@ $(function() {
       if (guide[1]) {
       	var deltaX = guide[1].X - guide[0].X;
 				var deltaY = guide[1].Y - guide[0].Y;
-				
-				for (var i = 0; i < 10; i++){
-					tangent.push({
-						X: guide[0].X + deltaX * i,
-						Y: guide[0].Y + deltaY * i
-					});
-				}
+
+				tangent.push({
+					X: guide[0].X,
+					Y: guide[0].Y
+				});
+
+				tangent.push({
+					X: guide[0].X + deltaX * guidanceRemaining,
+					Y: guide[0].Y + deltaY * guidanceRemaining
+				});
       }
 
       if (guidanceMode) {
