@@ -33,10 +33,6 @@ $(function() {
 
 	var recognizer = new DollarRecognizer;
 
-	var guidanceMode = false;
-	var tangentMode = false;
-	var recordMode = false;
-
 	// recognizer constants
 	// ------------------------------
 
@@ -48,8 +44,14 @@ $(function() {
 
 	// guidance parameters
 	// ------------------------------
+	
+	var guidanceMode = false;
+	var tangentMode = false;
+	var recordMode = false;
+	var presentMode = 0;
+	var guidanceRemaining = 15;
 
-	var guidanceRemaining = 5;
+	var presentForm = ['REMAINING', 'PROJECTION', 'CORRECTION']
 
 	// DOM selection
 	// ------------------------------
@@ -87,6 +89,11 @@ $(function() {
     if (event.keyCode == 82) {
 			recordMode = !recordMode;
     	$('#record-mode').text( recordMode ? 'ON' : 'OFF');
+    }
+
+    if (event.keyCode == 80) {
+			presentMode = (presentMode+1)%3;
+    	$('#present-mode').text(presentForm[presentMode]);
     }
 	});
 
@@ -151,7 +158,7 @@ $(function() {
 			$pathAccel.text(curAccel);
 
 			prevVelo = curVelo;
-			
+
       var realtimeData = recognizer.Realtime(gesturePath);
       $pathLength.text(realtimeData.Length);
       $pathAngle.text(realtimeData.Angle);
@@ -166,7 +173,7 @@ $(function() {
 			});
 			$pathStatus.text(pathStatus);
 
-      drawGuidance(realtimeData.Status, e.pageX, e.pageY, curVelo, curAccel);
+      drawGuidance(realtimeData.Status, startPos, curPos, curVelo, curAccel);
 
       menu.append('path')
 					.attr({
@@ -195,11 +202,11 @@ $(function() {
 		}
 	});
 
-	function drawGuidance(st, x, y, v, a) {
+	function drawGuidance(st, start, cur, v, a) {
 
 		menu.selectAll('.menu-svg .guidance').remove();
 
-		var weight = calculateWeight(st);
+		var weightArr = calculateWeight(st);
 
 		$.each(st, function(index, value) {
 			var offsetX = 0;
@@ -210,12 +217,37 @@ $(function() {
 				offsetY = value.Subtract[0].Y;
 			}
 
-			var guide = value.Subtract.slice(0,guidanceRemaining).map(function(element){
-				return {
-					X: element.X + x - offsetX,
-					Y: element.Y + y - offsetY
-				};
-      })
+			if (presentMode == 0) {
+				var guide = value.Subtract.slice(0,guidanceRemaining).map(function(element){
+					return {
+						X: element.X + cur.X - offsetX,
+						Y: element.Y + cur.Y - offsetY
+					};
+	      })
+			}
+
+			if (presentMode == 1) {
+				var guide = value.Subtract.slice(0,guidanceRemaining).map(function(element){
+					return {
+						X: element.X + start.X,
+						Y: element.Y + start.Y
+					};
+	      })
+
+	      guide.unshift({
+	      	X: cur.X,
+	      	Y: cur.Y
+	      })
+			}
+
+			if (presentMode == 2) {
+				var guide = value.Subtract.slice(0,guidanceRemaining).map(function(element){
+					return {
+						X: element.X + cur.X - offsetX,
+						Y: element.Y + cur.Y - offsetY
+					};
+	      })
+			}
 
       var tangent = new Array;
 
@@ -240,8 +272,8 @@ $(function() {
 						.attr({
 							'd': line(tangent),
 							'stroke': value.Color,
-							'stroke-width': weight[index]*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
-							'stroke-opacity': weight[index]*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
+							'stroke-width': weightArr[index]*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
+							'stroke-opacity': weightArr[index]*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
 							'class': 'guidance'
 						});
 	      } else {
@@ -249,8 +281,8 @@ $(function() {
 					.attr({
 						'd': line(guide),
 						'stroke': value.Color,
-						'stroke-width': weight[index]*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
-						'stroke-opacity': weight[index]*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
+						'stroke-width': weightArr[index]*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
+						'stroke-opacity': weightArr[index]*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
 						'class': 'guidance'
 					});
 	      }      	
