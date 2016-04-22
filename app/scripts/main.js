@@ -100,10 +100,27 @@ $(function() {
 	$(document).keyup(function(event){ 
 		if (event.keyCode == 90) {
 
-			$menuStatus.text('OFF');
-			d3.selectAll('.menu-svg path').remove();
-
 			var result = recognizer.Recognize(gesturePath);
+
+			if (result.Score >= RecognizerThresold) {
+				d3.selectAll('.menu-svg .guidance').remove();
+				d3.selectAll('.menu-svg .gesture')
+					.attr({
+						'stroke': result.Color
+					});
+
+				window.setTimeout(function (){
+					$menuStatus.text('OFF');
+					d3.selectAll('.menu-svg path').remove();
+				}, 1000);
+
+				hasResult = true;
+
+			} else {
+				$menuStatus.text('OFF');
+				d3.selectAll('.menu-svg path').remove();
+			}
+
 			$resultName.text(result.Name);
 			$resultScore.text(result.Score);
 			$resultTime.text(Date.now() - gestureStartTime);
@@ -184,21 +201,6 @@ $(function() {
 					});
 
 			prevPos = new Point(curPos.X, curPos.Y);
-
-			if ((realtimeData.Current.Score >= RecognizerThresold) && (realtimeData.Current.Score < 1)) {
-
-				d3.selectAll('.menu-svg .guidance').remove();
-				d3.selectAll('.menu-svg .gesture')
-					.attr({
-						'stroke': realtimeData.Current.Color
-					});
-
-				var result = recognizer.Recognize(gesturePath);
-				$resultName.text(result.Name);
-				$resultScore.text(result.Score);
-
-				hasResult = true;
-			}
 		}
 	});
 
