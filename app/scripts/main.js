@@ -78,7 +78,7 @@ $(function() {
 	$(document).keyup(function(event){ 
 		if (event.keyCode == 90) {
 
-			var result = recognizer.Recognize(gesturePath);
+			var result = recognizer.RecognizeR(gesturePath);
 
 			if (result.Score >= RecognizerThresold) {
 				d3.selectAll('.menu-svg .guidance').remove();
