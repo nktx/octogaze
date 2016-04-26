@@ -110,8 +110,6 @@ $(function() {
 				recordData.Name = result.Name;
 				recordData.Score = result.Score;
 				recordData.Time = Date.now() - gestureStartTime;
-				recordData.Prefix = guidanceMode;
-				recordData.Tangent = tangentMode;
 				recordData.Path = Resample(gesturePath, 128);
 
 				socket.emit('record', recordData);
