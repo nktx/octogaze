@@ -45,13 +45,8 @@ $(function() {
 	// guidance parameters
 	// ------------------------------
 	
-	var guidanceMode = false;
-	var tangentMode = false;
 	var recordMode = false;
-	var presentMode = 0;
 	var guidanceRemaining = 15;
-
-	var presentForm = ['REMAINING', 'PROJECTION', 'CORRECTION']
 
 	// DOM selection
 	// ------------------------------
@@ -62,8 +57,6 @@ $(function() {
 	var $resultTime = $('#result-time');
 	var $pathLength = $('#path-length');
 	var $pathAngle = $('#path-angle');
-	var $pathVelo = $('#path-velo');
-	var $pathAccel = $('#path-accel');
 	var $pathCurrent = $('#path-current');
 	var $pathStatus = $('#path-status');
 
@@ -76,24 +69,9 @@ $(function() {
 			$menuStatus.text('ON');
 		}
 
-		if (event.keyCode == 71) {
-			guidanceMode = !guidanceMode;
-    	$('#guidance-mode').text( guidanceMode ? 'ON' : 'OFF');
-		}
-		
-		if (event.keyCode == 84) {
-			tangentMode = !tangentMode;
-    	$('#tangent-mode').text( tangentMode ? 'ON' : 'OFF');
-    }
-
     if (event.keyCode == 82) {
 			recordMode = !recordMode;
     	$('#record-mode').text( recordMode ? 'ON' : 'OFF');
-    }
-
-    if (event.keyCode == 80) {
-			presentMode = (presentMode+1)%3;
-    	$('#present-mode').text(presentForm[presentMode]);
     }
 	});
 
@@ -147,9 +125,6 @@ $(function() {
 		}
 	});
 
-	var prevTime = 0;
-	var prevVelo = 0;
-
 	// gesture path drawing and recognizing
 	// ------------------------------
 
@@ -160,21 +135,10 @@ $(function() {
 				prevPos = new Point(e.pageX, e.pageY);
 				gestureStartTime = Date.now();
 				initStart = true;
-
-				prevTime = Date.now();
 			}
 		
 			curPos = new Point(e.pageX, e.pageY);
       gesturePath.push(new Point(curPos.X - startPos.X, curPos.Y - startPos.Y));
-
-			var timeDuration = Date.now()-prevTime;
-      var curVelo = Distance(curPos, prevPos)*1000/timeDuration;
-			var curAccel = curVelo - prevVelo*1000/timeDuration;
-
-			$pathVelo.text(curVelo);
-			$pathAccel.text(curAccel);
-
-			prevVelo = curVelo;
 
       var realtimeData = recognizer.Realtime(gesturePath);
       $pathLength.text(realtimeData.Length);
@@ -190,7 +154,7 @@ $(function() {
 			});
 			$pathStatus.text(pathStatus);
 
-      drawGuidance(realtimeData.Status, startPos, curPos, curVelo, curAccel);
+      drawGuidance(realtimeData.Status, startPos, curPos);
 
       menu.append('path')
 					.attr({
@@ -204,7 +168,7 @@ $(function() {
 		}
 	});
 
-	function drawGuidance(st, start, cur, v, a) {
+	function drawGuidance(st, start, cur) {
 
 		menu.selectAll('.menu-svg .guidance').remove();
 
@@ -219,37 +183,12 @@ $(function() {
 				offsetY = value.Subtract[0].Y;
 			}
 
-			if (presentMode == 0) {
-				var guide = value.Subtract.slice(0,guidanceRemaining).map(function(element){
-					return {
-						X: element.X + cur.X - offsetX,
-						Y: element.Y + cur.Y - offsetY
-					};
-	      })
-			}
-
-			if (presentMode == 1) {
-				var guide = value.Subtract.slice(0,guidanceRemaining).map(function(element){
-					return {
-						X: element.X + start.X,
-						Y: element.Y + start.Y
-					};
-	      })
-
-	      guide.unshift({
-	      	X: cur.X,
-	      	Y: cur.Y
-	      })
-			}
-
-			if (presentMode == 2) {
-				var guide = value.Subtract.slice(0,guidanceRemaining).map(function(element){
-					return {
-						X: element.X + cur.X - offsetX,
-						Y: element.Y + cur.Y - offsetY
-					};
-	      })
-			}
+			var guide = value.Subtract.slice(0,guidanceRemaining).map(function(element){
+				return {
+					X: element.X + cur.X - offsetX,
+					Y: element.Y + cur.Y - offsetY
+				};
+      })
 
       var tangent = new Array;
 
@@ -268,27 +207,27 @@ $(function() {
 				});
       }
 
-      if (guidanceMode) {
-      	if (tangentMode) {
-	      	menu.append('path')
-						.attr({
-							'd': line(tangent),
-							'stroke': value.Color,
-							'stroke-width': weightArr[index]*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
-							'stroke-opacity': weightArr[index]*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
-							'class': 'guidance'
-						});
-	      } else {
-	      	menu.append('path')
+      var tangentMode = 0;
+
+    	if (tangentMode) {
+      	menu.append('path')
 					.attr({
-						'd': line(guide),
+						'd': line(tangent),
 						'stroke': value.Color,
 						'stroke-width': weightArr[index]*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
 						'stroke-opacity': weightArr[index]*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
 						'class': 'guidance'
 					});
-	      }      	
-      }		
+      } else {
+      	menu.append('path')
+				.attr({
+					'd': line(guide),
+					'stroke': value.Color,
+					'stroke-width': weightArr[index]*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
+					'stroke-opacity': weightArr[index]*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
+					'class': 'guidance'
+				});
+      }
 		});	
 	}
 
