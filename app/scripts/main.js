@@ -166,13 +166,11 @@ $(function() {
 		}
 	});
 
-	function drawGuidance(st, start, cur) {
+	function drawGuidance(status, start, cur) {
 
 		menu.selectAll('.menu-svg .guidance').remove();
 
-		var weightArr = calculateWeight(st);
-
-		$.each(st, function(index, value) {
+		$.each(status, function(index, value) {
 			var offsetX = 0;
 			var offsetY = 0;
 
@@ -212,8 +210,8 @@ $(function() {
 					.attr({
 						'd': line(tangent),
 						'stroke': value.Color,
-						'stroke-width': weightArr[index]*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
-						'stroke-opacity': weightArr[index]*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
+						'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
+						'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
 						'class': 'guidance'
 					});
       } else {
@@ -221,22 +219,11 @@ $(function() {
 				.attr({
 					'd': line(guide),
 					'stroke': value.Color,
-					'stroke-width': weightArr[index]*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
-					'stroke-opacity': weightArr[index]*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
+					'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
+					'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
 					'class': 'guidance'
 				});
       }
 		});	
 	}
-
-	function calculateWeight(st) {
-		var w = new Array;
-
-		$.each(st, function(index, value) {
-			w.push(value.Score);
-		});
-
-		return w;
-	}
-
 });
