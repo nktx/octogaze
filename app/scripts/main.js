@@ -36,17 +36,17 @@ $(function() {
 	// recognizer constants
 	// ------------------------------
 
-	var StrokeWidth = 20;
-	var StrokeWidthThresold = 5;
-	var StrokeCapacity = 0.5;
-	var StrokeCapacityThresold = 0.3
+	var FillSize = 20;
+	var FillSizeThreshold = 5;
+	var FillCapacity = 0.5;
+	var FillCapacityThreshold = 0.3
 	var RecognizerThresold = 0.75;
 
 	// guidance parameters
 	// ------------------------------
 	
 	var recordMode = false;
-	var guidanceRemaining = 15;
+	var guidanceRemaining = 10;
 
 	// DOM selection
 	// ------------------------------
@@ -204,26 +204,38 @@ $(function() {
       }
 
       var tangentMode = 0;
+			
+			if (guide[0]) {
+				menu.append('circle')
+      	.attr({
+      		'cx': guide.slice(-1)[0].X,
+      		'cy': guide.slice(-1)[0].Y,
+      		'r': value.Score*(FillSize+FillSizeThreshold)-FillSizeThreshold,
+      		'fill': value.Color,
+      		'fill-opacity': value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold,
+      		'class': 'guidance'
+      	});
+			}
 
-    	if (tangentMode) {
-      	menu.append('path')
-					.attr({
-						'd': line(tangent),
-						'stroke': value.Color,
-						'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
-						'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
-						'class': 'guidance'
-					});
-      } else {
-      	menu.append('path')
-				.attr({
-					'd': line(guide),
-					'stroke': value.Color,
-					'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
-					'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
-					'class': 'guidance'
-				});
-      }
+    // 	if (tangentMode) {
+    //   	menu.append('path')
+				// 	.attr({
+				// 		'd': line(tangent),
+				// 		'stroke': value.Color,
+				// 		'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
+				// 		'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
+				// 		'class': 'guidance'
+				// 	});
+    //   } else {
+    //   	menu.append('path')
+				// .attr({
+				// 	'd': line(guide),
+				// 	'stroke': value.Color,
+				// 	'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
+				// 	'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
+				// 	'class': 'guidance'
+				// });
+    //   }
 		});	
 	}
 });
