@@ -17,3 +17,11 @@
 hr {
 	border-top: #FEFEFE 1px solid;
 }
+
+input {
+	border: none;
+
+	&:focus {
+		outline: none;
+	}
+}

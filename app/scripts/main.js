@@ -33,6 +33,8 @@ $(function() {
 
 	var recognizer = new DollarRecognizer;
 
+	$('#task-interface').text('GAZEBEACON');
+
 	// recognizer constants
 	// ------------------------------
 
@@ -51,13 +53,8 @@ $(function() {
 	// DOM selection
 	// ------------------------------
 
-	var $menuStatus = $('#menu-status');
-	var $resultName = $('#result-name');
-	var $resultScore = $('#result-score');
-	var $resultTime = $('#result-time');
-	var $pathLength = $('#path-length');
-	var $pathAngle = $('#path-angle');
-	var $pathCurrent = $('#path-current');
+	var $resultName = $('#task-result');
+	var $resultTime = $('#task-duration');
 	var $pathStatus = $('#path-status');
 
 	// menu switch
@@ -66,7 +63,6 @@ $(function() {
 	$(document).keydown(function(event){ 
 		if (event.keyCode == 90 && !hasResult) { 
 			menuMode = true;
-			$menuStatus.text('ON');
 		}
 
     if (event.keyCode == 82) {
@@ -88,19 +84,16 @@ $(function() {
 					});
 
 				window.setTimeout(function (){
-					$menuStatus.text('OFF');
 					d3.selectAll('.menu-svg path').remove();
 				}, 1000);
 
 				hasResult = true;
 
 			} else {
-				$menuStatus.text('OFF');
 				d3.selectAll('.menu-svg path').remove();
 			}
 
-			$resultName.text(result.Name);
-			$resultScore.text(result.Score);
+			$resultName.text(result.Name + '(' + Math.round(result.Score*1000)/1000 + ')');
 			$resultTime.text(Date.now() - gestureStartTime);
 
 			if (recordMode && hasResult) {
@@ -139,16 +132,14 @@ $(function() {
       gesturePath.push(new Point(curPos.X - startPos.X, curPos.Y - startPos.Y));
 
       var realtimeData = recognizer.Realtime(gesturePath);
-      $pathLength.text(realtimeData.Length);
-      $pathAngle.text(realtimeData.Angle);
-      $pathCurrent.text(realtimeData.Current.Name + ": " + realtimeData.Current.Score);
+      // $pathCurrent.text(realtimeData.Current.Name + '(' + Math.round(realtimeData.Current.Score*1000)/1000 + ')');
       
-			var pathStatus = '';
+			var pathStatus = realtimeData.Current.Name + '(' + Math.round(realtimeData.Current.Score*1000)/1000 + ') @ ';
 			$.each(realtimeData.Status, function(index, value){
 				pathStatus += value.Name;
-				pathStatus += ': ';
-				pathStatus += value.Score;
-				pathStatus += '; ';
+				pathStatus += '(';
+				pathStatus += Math.round(value.Score*1000)/1000;
+				pathStatus += ') ';
 			});
 			$pathStatus.text(pathStatus);
 
