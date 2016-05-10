@@ -1,68 +1,145 @@
-function Point(x, y)
-{
-	this.X = x;
-	this.Y = y;
-}
+var socket = io.connect();
+var recognizer = new DollarRecognizer;
+
+var canvas = d3.select('body')
+								.append('svg')
+								.attr('height', $(window).height())
+								.attr('width', $(window).width())
+								.attr('class', 'menu-svg');
+
+var line = d3.svg.line()
+					.x(function(d) {
+						return d.X;
+					})
+					.y(function(d) {
+						return d.Y;
+					})
+					.interpolate('basis');
+
+var recordMode = false;
+
+Record = function(x, y) {
+	this.interface = $('#task-interface').text();
+	this.subject = $('#task-subject').val();
+	this.result = "";
+	this.score = 0;
+	this.duration = 0;
+	this.path = [];
+	this.startTime = Date.now();
+	this.startPosition = {
+		X: x,
+		Y: y
+	};
+
+	this.record = function(x, y) {
+		this.path.push({
+			X: x,
+			Y: y
+		})
+	};
+	
+	this.end = function(r, s) {
+		this.duration = Date.now() - this.startTime;
+		this.score = Math.round(s*1000)/1000;
+
+		$('#task-duration').text(this.duration);
+		if (s !== 0) {
+			this.result = r;
+			$('#task-result').text(this.result + '(' + this.score + ')');
+		} else {
+			$('#task-result').text('-');
+		}
+
+		console.log(this);
+		if (recordMode) {
+			socket.emit('record', this);
+		}
+	};
+};
+
+Menu = function() {
+	this.mode = false;
+	
+	this.open = function(x, y) {
+		this.mode = true;
+		this.gesturePath = [];
+		this.gesturePath.push(new Point(0, 0));
+
+		this.startPos = this.prevPos = this.curPos = new Point(x, y);
+
+		this.record = new Record(x, y);
+		this.record.record(0, 0);
+	};
+
+	this.move = function(x, y) {
+		this.curPos = new Point(x, y);
+		this.record.record(x - this.startPos.X, y - this.startPos.Y);
+
+    this.gesturePath.push(new Point(x - this.startPos.X, y - this.startPos.Y));
+		this.realtime	= recognizer.Realtime(this.gesturePath);
+
+		var pathStatus = this.realtime.Current.Name + '(' + Math.round(this.realtime.Current.Score*1000)/1000 + ') + ';
+		$.each(this.realtime.Status, function(index, value){
+			pathStatus += value.Name;
+			pathStatus += '(';
+			pathStatus += Math.round(value.Score*1000)/1000;
+			pathStatus += ') ';
+		});
+		$('#path-status').text(pathStatus);
+
+    canvas
+  		.append('path')
+			.attr({
+				'd': line([this.prevPos, this.curPos]),
+				'stroke': '#EFEFEF',
+				'stroke-width': '3px',
+				'class': 'gesture'
+			});
+
+		// drawGuidance(realtimeData.Status, startPos, curPos);
+
+		this.prevPos = this.curPos;
+	}
+	
+	this.close = function() {
+		this.mode = false;
+
+		this.result = recognizer.RecognizeR(this.gesturePath);
+		this.record.end(this.result.Name, this.result.Score);
+
+		if (this.result.Score >= 0.75) {
+			d3.selectAll('.menu-svg .guidance').remove();
+			d3.selectAll('.menu-svg .gesture')
+				.attr({
+					'stroke': this.result.Color
+				});
+
+			window.setTimeout(function (){
+				d3.selectAll('.menu-svg path').remove();
+			}, 1000);
+
+		} else {
+			d3.selectAll('.menu-svg path').remove();
+		}
+	};
+};
 
 $(function() {
 
-	socket = io.connect();
-
-	var menuMode = false;
-	var initStart = false;
-	var hasResult = false;
-	var gesturePath = [];
-
-	var gestureStartTime = 0;
-	var curPos, prevPos, startPos;
-
-	var menu = d3.select('body')
-							.append('svg')
-							.attr('height', $(window).height())
-							.attr('width', $(window).width())
-							.attr('class', 'menu-svg');
-
-	var line = d3.svg.line()
-						.x(function(d) {
-							return d.X;
-						})
-						.y(function(d) {
-							return d.Y;
-						})
-						.interpolate('basis');
-
-	var recognizer = new DollarRecognizer;
-
+	var allowed = true;
 	$('#task-interface').text('GAZEBEACON');
 
-	// recognizer constants
-	// ------------------------------
+	var menu = new Menu();
 
-	var FillSize = 20;
-	var FillSizeThreshold = 5;
-	var FillCapacity = 0.5;
-	var FillCapacityThreshold = 0.3
-	var RecognizerThresold = 0.75;
+	$(document).keydown(function(event){
 
-	// guidance parameters
-	// ------------------------------
-	
-	var recordMode = false;
-	var guidanceRemaining = 10;
+		// avoid keydown event repeated
+		if (event.repeat != undefined) { allowed = !event.repeat; }
+	  if (!allowed) return;
+	  allowed = false;
 
-	// DOM selection
-	// ------------------------------
-
-	var $resultName = $('#task-result');
-	var $resultTime = $('#task-duration');
-	var $pathStatus = $('#path-status');
-
-	// menu switch
-	// ------------------------------
-
-	$(document).keydown(function(event){ 
-		if (event.keyCode == 90 && !hasResult) { 
-			menuMode = true;
+		if (event.keyCode == 90) { 
+			menu.open(window.x, window.y);
 		}
 
     if (event.keyCode == 82) {
@@ -72,161 +149,98 @@ $(function() {
 	});
 
 	$(document).keyup(function(event){ 
+		allowed = true;
+
 		if (event.keyCode == 90) {
-
-			var result = recognizer.RecognizeR(gesturePath);
-
-			if (result.Score >= RecognizerThresold) {
-				d3.selectAll('.menu-svg .guidance').remove();
-				d3.selectAll('.menu-svg .gesture')
-					.attr({
-						'stroke': result.Color
-					});
-
-				window.setTimeout(function (){
-					d3.selectAll('.menu-svg path').remove();
-				}, 1000);
-
-				hasResult = true;
-
-			} else {
-				d3.selectAll('.menu-svg path').remove();
-			}
-
-			$resultName.text(result.Name + '(' + Math.round(result.Score*1000)/1000 + ')');
-			$resultTime.text(Date.now() - gestureStartTime);
-
-			if (recordMode && hasResult) {
-				
-				var recordData = new Object;
-
-				recordData.Name = result.Name;
-				recordData.Score = result.Score;
-				recordData.Time = Date.now() - gestureStartTime;
-				recordData.Path = Resample(gesturePath, 128);
-
-				socket.emit('record', recordData);
-			}
-
-			menuMode = false;
-			initStart = false;
-			gesturePath = [];
-
-			hasResult = false;
+			menu.close();
 		}
 	});
-
-	// gesture path drawing and recognizing
-	// ------------------------------
 
 	$(document).mousemove(function(e) {
-		if (menuMode && !hasResult) {
-			if (!initStart) {
-				startPos = new Point(e.pageX, e.pageY);
-				prevPos = new Point(e.pageX, e.pageY);
-				gestureStartTime = Date.now();
-				initStart = true;
-			}
-		
-			curPos = new Point(e.pageX, e.pageY);
-      gesturePath.push(new Point(curPos.X - startPos.X, curPos.Y - startPos.Y));
+		window.x = e.pageX;
+    window.y = e.pageY;
 
-      var realtimeData = recognizer.Realtime(gesturePath);
-      // $pathCurrent.text(realtimeData.Current.Name + '(' + Math.round(realtimeData.Current.Score*1000)/1000 + ')');
-      
-			var pathStatus = realtimeData.Current.Name + '(' + Math.round(realtimeData.Current.Score*1000)/1000 + ') @ ';
-			$.each(realtimeData.Status, function(index, value){
-				pathStatus += value.Name;
-				pathStatus += '(';
-				pathStatus += Math.round(value.Score*1000)/1000;
-				pathStatus += ') ';
-			});
-			$pathStatus.text(pathStatus);
-
-      drawGuidance(realtimeData.Status, startPos, curPos);
-
-      menu.append('path')
-					.attr({
-						'd': line([prevPos, curPos]),
-						'stroke': '#EFEFEF',
-						'stroke-width': '3px',
-						'class': 'gesture'
-					});
-
-			prevPos = new Point(curPos.X, curPos.Y);
+		if (menu.mode) {
+			menu.move(window.x, window.y);
 		}
 	});
 
-	function drawGuidance(status, start, cur) {
+	var FillSize = 20;
+	var FillSizeThreshold = 5;
+	var FillCapacity = 0.5;
+	var FillCapacityThreshold = 0.3
+	var guidanceRemaining = 10;
 
-		menu.selectAll('.menu-svg .guidance').remove();
+	// function drawGuidance(status, start, cur) {
 
-		$.each(status, function(index, value) {
-			var offsetX = 0;
-			var offsetY = 0;
+	// 	menu.selectAll('.menu-svg .guidance').remove();
 
-			if (value.Subtract[0]) {
-				offsetX = value.Subtract[0].X;
-				offsetY = value.Subtract[0].Y;
-			}
+	// 	$.each(status, function(index, value) {
+	// 		var offsetX = 0;
+	// 		var offsetY = 0;
 
-			var guide = value.Subtract.slice(0,guidanceRemaining).map(function(element){
-				return {
-					X: element.X + cur.X - offsetX,
-					Y: element.Y + cur.Y - offsetY
-				};
-      })
+	// 		if (value.Subtract[0]) {
+	// 			offsetX = value.Subtract[0].X;
+	// 			offsetY = value.Subtract[0].Y;
+	// 		}
 
-      var tangent = new Array;
+	// 		var guide = value.Subtract.slice(0,guidanceRemaining).map(function(element){
+	// 			return {
+	// 				X: element.X + cur.X - offsetX,
+	// 				Y: element.Y + cur.Y - offsetY
+	// 			};
+ //      })
 
-      if (guide[1]) {
-      	var deltaX = guide[1].X - guide[0].X;
-				var deltaY = guide[1].Y - guide[0].Y;
+ //      var tangent = new Array;
 
-				tangent.push({
-					X: guide[0].X,
-					Y: guide[0].Y
-				});
+ //      if (guide[1]) {
+ //      	var deltaX = guide[1].X - guide[0].X;
+	// 			var deltaY = guide[1].Y - guide[0].Y;
 
-				tangent.push({
-					X: guide[0].X + deltaX * guidanceRemaining,
-					Y: guide[0].Y + deltaY * guidanceRemaining
-				});
-      }
+	// 			tangent.push({
+	// 				X: guide[0].X,
+	// 				Y: guide[0].Y
+	// 			});
 
-      var tangentMode = 0;
+	// 			tangent.push({
+	// 				X: guide[0].X + deltaX * guidanceRemaining,
+	// 				Y: guide[0].Y + deltaY * guidanceRemaining
+	// 			});
+ //      }
+
+ //      var tangentMode = 0;
 			
-			if (guide[0]) {
-				menu.append('circle')
-      	.attr({
-      		'cx': guide.slice(-1)[0].X,
-      		'cy': guide.slice(-1)[0].Y,
-      		'r': value.Score*(FillSize+FillSizeThreshold)-FillSizeThreshold,
-      		'fill': value.Color,
-      		'fill-opacity': value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold,
-      		'class': 'guidance'
-      	});
-			}
+	// 		if (guide[0]) {
+	// 			menu.append('circle')
+ //      	.attr({
+ //      		'cx': guide.slice(-1)[0].X,
+ //      		'cy': guide.slice(-1)[0].Y,
+ //      		'r': value.Score*(FillSize+FillSizeThreshold)-FillSizeThreshold,
+ //      		'fill': value.Color,
+ //      		'fill-opacity': value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold,
+ //      		'class': 'guidance'
+ //      	});
+	// 		}
 
-    // 	if (tangentMode) {
-    //   	menu.append('path')
-				// 	.attr({
-				// 		'd': line(tangent),
-				// 		'stroke': value.Color,
-				// 		'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
-				// 		'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
-				// 		'class': 'guidance'
-				// 	});
-    //   } else {
-    //   	menu.append('path')
-				// .attr({
-				// 	'd': line(guide),
-				// 	'stroke': value.Color,
-				// 	'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
-				// 	'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
-				// 	'class': 'guidance'
-				// });
-    //   }
-		});	
-	}
+ //    // 	if (tangentMode) {
+ //    //   	menu.append('path')
+	// 			// 	.attr({
+	// 			// 		'd': line(tangent),
+	// 			// 		'stroke': value.Color,
+	// 			// 		'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
+	// 			// 		'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
+	// 			// 		'class': 'guidance'
+	// 			// 	});
+ //    //   } else {
+ //    //   	menu.append('path')
+	// 			// .attr({
+	// 			// 	'd': line(guide),
+	// 			// 	'stroke': value.Color,
+	// 			// 	'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
+	// 			// 	'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
+	// 			// 	'class': 'guidance'
+	// 			// });
+ //    //   }
+	// 	});	
+	// }
 });
