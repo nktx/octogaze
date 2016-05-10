@@ -129,7 +129,6 @@ Menu = function() {
 		var FillSizeThreshold = 5;
 		var FillCapacity = 0.5;
 		var FillCapacityThreshold = 0.3
-		var guidanceRemaining = 10;
 
 		canvas.selectAll('.menu-svg .guidance').remove();
 
@@ -142,31 +141,31 @@ Menu = function() {
 				offsetY = value.Subtract[0].Y;
 			}
 
-			var guide = value.Subtract.slice(0,guidanceRemaining).map(function(element){
+			var guide = value.Subtract.map(function(element){
 				return {
 					X: element.X + cur.X - offsetX,
 					Y: element.Y + cur.Y - offsetY
 				};
       })
 
-      var tangent = new Array;
+    //   var tangent = new Array;
 
-      if (guide[1]) {
-      	var deltaX = guide[1].X - guide[0].X;
-				var deltaY = guide[1].Y - guide[0].Y;
+    //   if (guide[1]) {
+    //   	var deltaX = guide[1].X - guide[0].X;
+				// var deltaY = guide[1].Y - guide[0].Y;
 
-				tangent.push({
-					X: guide[0].X,
-					Y: guide[0].Y
-				});
+				// tangent.push({
+				// 	X: guide[0].X,
+				// 	Y: guide[0].Y
+				// });
 
-				tangent.push({
-					X: guide[0].X + deltaX * guidanceRemaining,
-					Y: guide[0].Y + deltaY * guidanceRemaining
-				});
-      }
+				// tangent.push({
+				// 	X: guide[0].X + deltaX * guidanceRemaining,
+				// 	Y: guide[0].Y + deltaY * guidanceRemaining
+				// });
+    //   }
 
-      var tangentMode = 0;
+      // var tangentMode = 0;
 			
 			if (guide[0]) {
 				canvas.append('circle')

@@ -88,6 +88,7 @@ function Rectangle(x, y, width, height) // constructor
 function Unistroke(color, name, points) // constructor
 {
 	this.Name = name;
+	this.Original = JSON.parse(JSON.stringify(points));
 	this.Points = Resample(points, NumPoints);
 	var radians = IndicativeAngle(this.Points);
 	// this.Points = RotateBy(this.Points, -radians);
@@ -96,6 +97,7 @@ function Unistroke(color, name, points) // constructor
 	this.Vector = Vectorize(this.Points); // for Protractor
 	this.Length = PathLength(points);
 	this.Color = color;
+	this.Corner = FindCorner(this.Original, this.Points);
 }
 function UnistrokeR(color, name, points) // constructor
 {
@@ -161,9 +163,6 @@ function DollarRecognizer() // constructor
 	this.Realtime = function(points)
 	{
 		points = Resample(points, NumPoints);
-		// var radians = IndicativeAngle(points);
-		// points = RotateBy(points, -radians);
-		// points = TranslateTo(points, Origin);
 
 		var length = PathLength(points);
 		var angle = IndicativeAngle(points);
@@ -173,22 +172,27 @@ function DollarRecognizer() // constructor
 		for (var i = 0; i < this.Unistrokes.length; i++) {
 			var p = length/PathLength(this.Unistrokes[i].Points);
 			var n = Math.round(this.Unistrokes[i].Points.length * p);
+			
+			var s = n;
+			var e = n + 10;
+			for (j = 0; j < this.Unistrokes[i].Corner.length; j++) {
+				if (s < this.Unistrokes[i].Corner[j] && this.Unistrokes[i].Corner[j] < e) {
+					e = this.Unistrokes[i].Corner[j] + 1;
+				}
+			}
+			var remain = this.Unistrokes[i].Points.slice(s, e);
 
 			var sub = this.Unistrokes[i].Points.slice(n);
 			var perf = points.concat(sub);
 
 			perf = Resample(perf, NumPoints);
-			// var radians = IndicativeAngle(perf);
-			// perf = RotateBy(perf, -radians);
-			// perf = TranslateTo(perf, Origin);
-
 			var d = DistanceAtBestAngle(perf, this.Unistrokes[i], -AngleRange, +AngleRange, AnglePrecision);
 			
 			var st = {
 				Name: this.Unistrokes[i].Name,
 				Color: this.Unistrokes[i].Color,
 				Score: 1.0 - d / HalfDiagonal,	
-				Subtract: sub
+				Subtract: remain
 			};
 
 			status.push(st);
@@ -272,6 +276,23 @@ function DollarRecognizer() // constructor
 //
 // Private helper functions from this point down
 //
+function FindCorner(o, r) {
+	var c = [];
+	for (var i = 0; i < o.length; i++) {	
+		var b = +Infinity;
+		var u = -1;
+		for (var j = 0; j < r.length; j++) {
+			var d = Distance(o[i], r[j]);
+			if (d < b) {
+				b = d;
+				u = j;
+			}
+		}
+		c.push(u);
+	}
+	return c;
+}
+
 function Resample(points, n)
 {
 	var I = PathLength(points) / (n - 1); // interval length
