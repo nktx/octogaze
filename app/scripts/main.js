@@ -115,11 +115,12 @@ Menu = function() {
 				});
 
 			window.setTimeout(function (){
-				d3.selectAll('.menu-svg path').remove();
+				d3.selectAll('.menu-svg .gesture').remove();
 			}, 1000);
 
 		} else {
-			d3.selectAll('.menu-svg path').remove();
+			d3.selectAll('.menu-svg .guidance').remove();
+			d3.selectAll('.menu-svg .gesture').remove();
 		}
 	};
 
