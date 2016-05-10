@@ -26,6 +26,23 @@ io.on('connection', function(socket){
 		});
 	});
 
+	socket.on('readfile', function(){
+		var data = [];
+
+		fs.readdir('data/', function(err, filenames) {
+			if (err) {
+				onError(err);
+			}
+
+			filenames.forEach(function(filename) {
+				var file = 'data/' + filename;
+				data.push(jsonfile.readFileSync(file))
+			});
+
+			socket.emit('filedata', data);
+		});			
+	});
+
 	socket.on('disconnect', function(){
 		console.log('user disconnected');
 	});
@@ -39,6 +56,14 @@ app.use(bodyParser.json());
 
 app.get('/', function(req, res) {
 	res.render('pages/index');
+});
+
+app.get('/gazebeacon', function(req, res) {
+	res.render('pages/gazebeacon');
+});
+
+app.get('/gazebeaconr', function(req, res) {
+	res.render('pages/gazebeaconr');
 });
 
 // app.listen(8080);
