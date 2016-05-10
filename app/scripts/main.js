@@ -96,7 +96,7 @@ Menu = function() {
 				'class': 'gesture'
 			});
 
-		// drawGuidance(realtimeData.Status, startPos, curPos);
+		drawGuidance(this.realtime.Status, this.startPos, this.curPos);
 
 		this.prevPos = this.curPos;
 	}
@@ -122,6 +122,87 @@ Menu = function() {
 			d3.selectAll('.menu-svg path').remove();
 		}
 	};
+
+	function drawGuidance(status, start, cur) {
+
+		var FillSize = 20;
+		var FillSizeThreshold = 5;
+		var FillCapacity = 0.5;
+		var FillCapacityThreshold = 0.3
+		var guidanceRemaining = 10;
+
+		canvas.selectAll('.menu-svg .guidance').remove();
+
+		$.each(status, function(index, value) {
+			var offsetX = 0;
+			var offsetY = 0;
+
+			if (value.Subtract[0]) {
+				offsetX = value.Subtract[0].X;
+				offsetY = value.Subtract[0].Y;
+			}
+
+			var guide = value.Subtract.slice(0,guidanceRemaining).map(function(element){
+				return {
+					X: element.X + cur.X - offsetX,
+					Y: element.Y + cur.Y - offsetY
+				};
+      })
+
+      var tangent = new Array;
+
+      if (guide[1]) {
+      	var deltaX = guide[1].X - guide[0].X;
+				var deltaY = guide[1].Y - guide[0].Y;
+
+				tangent.push({
+					X: guide[0].X,
+					Y: guide[0].Y
+				});
+
+				tangent.push({
+					X: guide[0].X + deltaX * guidanceRemaining,
+					Y: guide[0].Y + deltaY * guidanceRemaining
+				});
+      }
+
+      var tangentMode = 0;
+			
+			if (guide[0]) {
+				canvas.append('circle')
+	      	.attr({
+	      		'cx': guide.slice(-1)[0].X,
+	      		'cy': guide.slice(-1)[0].Y,
+	      		'r': Math.max(value.Score*(FillSize+FillSizeThreshold)-FillSizeThreshold, 0),
+	      		'fill': value.Color,
+	      		'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
+	      		'class': 'guidance'
+	      	});
+			}
+
+    // 	if (tangentMode) {
+    //   	menu.append('path')
+				// 	.attr({
+				// 		'd': line(tangent),
+				// 		'stroke': value.Color,
+				// 		'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
+				// 		'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
+				// 		'class': 'guidance'
+				// 	});
+    //   } else {
+    //   	menu.append('path')
+				// .attr({
+				// 	'd': line(guide),
+				// 	'stroke': value.Color,
+				// 	'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
+				// 	'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
+				// 	'class': 'guidance'
+				// });
+    //   }
+		});	
+	}
+
+
 };
 
 $(function() {
@@ -164,83 +245,4 @@ $(function() {
 			menu.move(window.x, window.y);
 		}
 	});
-
-	var FillSize = 20;
-	var FillSizeThreshold = 5;
-	var FillCapacity = 0.5;
-	var FillCapacityThreshold = 0.3
-	var guidanceRemaining = 10;
-
-	// function drawGuidance(status, start, cur) {
-
-	// 	menu.selectAll('.menu-svg .guidance').remove();
-
-	// 	$.each(status, function(index, value) {
-	// 		var offsetX = 0;
-	// 		var offsetY = 0;
-
-	// 		if (value.Subtract[0]) {
-	// 			offsetX = value.Subtract[0].X;
-	// 			offsetY = value.Subtract[0].Y;
-	// 		}
-
-	// 		var guide = value.Subtract.slice(0,guidanceRemaining).map(function(element){
-	// 			return {
-	// 				X: element.X + cur.X - offsetX,
-	// 				Y: element.Y + cur.Y - offsetY
-	// 			};
- //      })
-
- //      var tangent = new Array;
-
- //      if (guide[1]) {
- //      	var deltaX = guide[1].X - guide[0].X;
-	// 			var deltaY = guide[1].Y - guide[0].Y;
-
-	// 			tangent.push({
-	// 				X: guide[0].X,
-	// 				Y: guide[0].Y
-	// 			});
-
-	// 			tangent.push({
-	// 				X: guide[0].X + deltaX * guidanceRemaining,
-	// 				Y: guide[0].Y + deltaY * guidanceRemaining
-	// 			});
- //      }
-
- //      var tangentMode = 0;
-			
-	// 		if (guide[0]) {
-	// 			menu.append('circle')
- //      	.attr({
- //      		'cx': guide.slice(-1)[0].X,
- //      		'cy': guide.slice(-1)[0].Y,
- //      		'r': value.Score*(FillSize+FillSizeThreshold)-FillSizeThreshold,
- //      		'fill': value.Color,
- //      		'fill-opacity': value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold,
- //      		'class': 'guidance'
- //      	});
-	// 		}
-
- //    // 	if (tangentMode) {
- //    //   	menu.append('path')
-	// 			// 	.attr({
-	// 			// 		'd': line(tangent),
-	// 			// 		'stroke': value.Color,
-	// 			// 		'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
-	// 			// 		'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
-	// 			// 		'class': 'guidance'
-	// 			// 	});
- //    //   } else {
- //    //   	menu.append('path')
-	// 			// .attr({
-	// 			// 	'd': line(guide),
-	// 			// 	'stroke': value.Color,
-	// 			// 	'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
-	// 			// 	'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
-	// 			// 	'class': 'guidance'
-	// 			// });
- //    //   }
-	// 	});	
-	// }
 });
