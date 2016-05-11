@@ -66,5 +66,9 @@ app.get('/gazebeaconr', function(req, res) {
 	res.render('pages/gazebeaconr');
 });
 
+app.get('/makecircle', function(req, res) {
+	res.render('pages/makecircle');
+});
+
 // app.listen(8080);
 // console.log('server listening on port 8080');

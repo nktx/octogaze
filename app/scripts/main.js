@@ -17,6 +17,8 @@ var line = d3.svg.line()
 					.interpolate('basis');
 
 var recordMode = false;
+var modes = ['NOGUIDE', 'REMAIN', 'TANGENT'];
+var guidanceMode = 0;
 
 Record = function(x, y) {
 	this.interface = $('#task-interface').text();
@@ -149,68 +151,53 @@ Menu = function() {
 				};
       })
 
-    //   var tangent = new Array;
+			if ((guidanceMode == 2) && (guide.length >= 2)) {
+				var tangent = new Array;
 
-    //   if (guide[1]) {
-    //   	var deltaX = guide[1].X - guide[0].X;
-				// var deltaY = guide[1].Y - guide[0].Y;
+      	var deltaX = guide[1].X - guide[0].X;
+				var deltaY = guide[1].Y - guide[0].Y;
 
-				// tangent.push({
-				// 	X: guide[0].X,
-				// 	Y: guide[0].Y
-				// });
+				tangent.push({
+					X: guide[0].X,
+					Y: guide[0].Y
+				});
+				tangent.push({
+					X: guide[0].X + deltaX * 10,
+					Y: guide[0].Y + deltaY * 10
+				});
 
-				// tangent.push({
-				// 	X: guide[0].X + deltaX * guidanceRemaining,
-				// 	Y: guide[0].Y + deltaY * guidanceRemaining
-				// });
-    //   }
-
-      // var tangentMode = 0;
-			
-			if (guide[0]) {
-				canvas.append('circle')
-	      	.attr({
-	      		'cx': guide.slice(-1)[0].X,
-	      		'cy': guide.slice(-1)[0].Y,
-	      		'r': Math.max(value.Score*(FillSize+FillSizeThreshold)-FillSizeThreshold, 0),
-	      		'fill': value.Color,
-	      		'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
-	      		'class': 'guidance'
-	      	});
+				canvas
+			  		.append('path')
+						.attr({
+							'd': line(tangent),
+							'stroke': value.Color,
+							'stroke-width': value.Score*(20+5)-5 +'px',
+							'stroke-opacity': value.Score*(0.5+0.3)-0.3,
+							'class': 'guidance'
+						});
+				
+			} else if ((guidanceMode == 1) && (guide.length >= 1)) {
+				canvas
+		  		.append('path')
+					.attr({
+						'd': line(guide),
+						'stroke': value.Color,
+						'stroke-width': value.Score*(20+5)-5 +'px',
+						'stroke-opacity': value.Score*(0.5+0.3)-0.3,
+						'class': 'guidance'
+					});
 			}
+		});
 
-    // 	if (tangentMode) {
-    //   	menu.append('path')
-				// 	.attr({
-				// 		'd': line(tangent),
-				// 		'stroke': value.Color,
-				// 		'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
-				// 		'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
-				// 		'class': 'guidance'
-				// 	});
-    //   } else {
-    //   	menu.append('path')
-				// .attr({
-				// 	'd': line(guide),
-				// 	'stroke': value.Color,
-				// 	'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
-				// 	'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
-				// 	'class': 'guidance'
-				// });
-    //   }
-		});	
 	}
-
-
 };
 
 $(function() {
 
 	var allowed = true;
-	$('#task-interface').text('GAZEBEACON');
-
 	var menu = new Menu();
+	
+	$('#task-interface').text(modes[guidanceMode]);
 
 	$(document).keydown(function(event){
 
@@ -226,6 +213,11 @@ $(function() {
     if (event.keyCode == 82) {
 			recordMode = !recordMode;
     	$('#record-mode').text( recordMode ? 'ON' : 'OFF');
+    }
+
+    if (event.keyCode == 80) {
+    	guidanceMode = (guidanceMode+1)%3;
+    	$('#task-interface').text(modes[guidanceMode]);
     }
 	});
 
