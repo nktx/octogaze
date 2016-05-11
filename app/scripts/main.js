@@ -162,17 +162,17 @@ Menu = function() {
 					Y: guide[0].Y
 				});
 				tangent.push({
-					X: guide[0].X + deltaX * 10,
-					Y: guide[0].Y + deltaY * 10
+					X: guide[0].X + deltaX * 5,
+					Y: guide[0].Y + deltaY * 5
 				});
 
 				canvas
 			  		.append('path')
 						.attr({
 							'd': line(tangent),
-							'stroke': value.Color,
-							'stroke-width': value.Score*(20+5)-5 +'px',
-							'stroke-opacity': value.Score*(0.5+0.3)-0.3,
+							'stroke': '#3498db',
+							'stroke-width': '20px',
+							'stroke-opacity': 0.5,
 							'class': 'guidance'
 						});
 				
@@ -181,9 +181,9 @@ Menu = function() {
 		  		.append('path')
 					.attr({
 						'd': line(guide),
-						'stroke': value.Color,
-						'stroke-width': value.Score*(20+5)-5 +'px',
-						'stroke-opacity': value.Score*(0.5+0.3)-0.3,
+						'stroke': '#e74c3c',
+						'stroke-width': '20px',
+						'stroke-opacity': 0.5,
 						'class': 'guidance'
 					});
 			}

@@ -125,10 +125,10 @@ function Result(color, name, score) // constructor
 //
 
 // var NumUnistrokes = 16;
-var NumUnistrokes = 4;
+var NumUnistrokes = 1;
 
 var NumPoints = 64;
-var SquareSize = 250.0;
+var SquareSize = 500.0;
 var Origin = new Point(0,0);
 var Diagonal = Math.sqrt(SquareSize * SquareSize + SquareSize * SquareSize);
 var HalfDiagonal = 0.5 * Diagonal;
@@ -138,22 +138,36 @@ var Phi = 0.5 * (-1.0 + Math.sqrt(5.0)); // Golden Ratio
 //
 // DollarRecognizer class
 //
+
+function toRadians (angle) {
+  return angle * (Math.PI / 180);
+}
+
 function DollarRecognizer() // constructor
 {
 	//
 	// one built-in unistroke per gesture type
 	//
+
+	var clockwise = new Array;
+
+	for (var i = 0; i <= 360; i += 10) {
+		clockwise.push(new Point((SquareSize/2)*Math.cos(toRadians(i)), (SquareSize/2)*Math.sin(toRadians(i))));
+	}
+
 	this.Unistrokes = new Array(NumUnistrokes);
-	this.Unistrokes[0] = new Unistroke("#E74C3C", "L", new Array(new Point(0,0), new Point(0,SquareSize), new Point(SquareSize,SquareSize)));
-	this.Unistrokes[1] = new Unistroke("#F1C40F", "Z", new Array(new Point(0,0), new Point(SquareSize,0), new Point(0,SquareSize), new Point(SquareSize,SquareSize)));
-	this.Unistrokes[2] = new Unistroke("#2ECC71", "M", new Array(new Point(0,0), new Point(0,SquareSize*(-1)), new Point(SquareSize/2,0), new Point(SquareSize,SquareSize*(-1)), new Point(SquareSize,0)));
-	this.Unistrokes[3] = new Unistroke("#3498DB", "A", new Array(new Point(0,0), new Point(SquareSize/2,SquareSize*(-1)), new Point(SquareSize,0)));
+	// this.Unistrokes[0] = new Unistroke("#E74C3C", "L", new Array(new Point(0,0), new Point(0,SquareSize), new Point(SquareSize,SquareSize)));
+	// this.Unistrokes[1] = new Unistroke("#F1C40F", "Z", new Array(new Point(0,0), new Point(SquareSize,0), new Point(0,SquareSize), new Point(SquareSize,SquareSize)));
+	// this.Unistrokes[2] = new Unistroke("#2ECC71", "M", new Array(new Point(0,0), new Point(0,SquareSize*(-1)), new Point(SquareSize/2,0), new Point(SquareSize,SquareSize*(-1)), new Point(SquareSize,0)));
+	// this.Unistrokes[3] = new Unistroke("#3498DB", "A", new Array(new Point(0,0), new Point(SquareSize/2,SquareSize*(-1)), new Point(SquareSize,0)));
+	this.Unistrokes[0] = new Unistroke("#34495e", "O", clockwise.slice(0,36));
 
 	this.UnistrokesR = new Array(NumUnistrokes);
-	this.UnistrokesR[0] = new UnistrokeR("#E74C3C", "L", new Array(new Point(0,0), new Point(0,SquareSize), new Point(SquareSize,SquareSize)));
-	this.UnistrokesR[1] = new UnistrokeR("#F1C40F", "Z", new Array(new Point(0,0), new Point(SquareSize,0), new Point(0,SquareSize), new Point(SquareSize,SquareSize)));
-	this.UnistrokesR[2] = new UnistrokeR("#2ECC71", "M", new Array(new Point(0,0), new Point(0,SquareSize*(-1)), new Point(SquareSize/2,0), new Point(SquareSize,SquareSize*(-1)), new Point(SquareSize,0)));
-	this.UnistrokesR[3] = new UnistrokeR("#3498DB", "A", new Array(new Point(0,0), new Point(SquareSize/2,SquareSize*(-1)), new Point(SquareSize,0)));
+	// this.UnistrokesR[0] = new UnistrokeR("#E74C3C", "L", new Array(new Point(0,0), new Point(0,SquareSize), new Point(SquareSize,SquareSize)));
+	// this.UnistrokesR[1] = new UnistrokeR("#F1C40F", "Z", new Array(new Point(0,0), new Point(SquareSize,0), new Point(0,SquareSize), new Point(SquareSize,SquareSize)));
+	// this.UnistrokesR[2] = new UnistrokeR("#2ECC71", "M", new Array(new Point(0,0), new Point(0,SquareSize*(-1)), new Point(SquareSize/2,0), new Point(SquareSize,SquareSize*(-1)), new Point(SquareSize,0)));
+	// this.UnistrokesR[3] = new UnistrokeR("#3498DB", "A", new Array(new Point(0,0), new Point(SquareSize/2,SquareSize*(-1)), new Point(SquareSize,0)));
+	this.UnistrokesR[0] = new UnistrokeR("#34495e", "O", clockwise.slice(0,36));
 
 	// colors = ['#E74C3C', '#E67E22', '#F1C40F', '#2ECC71', '#1CC9A8', '#3498DB', '#9B59B6'];
 
@@ -174,7 +188,7 @@ function DollarRecognizer() // constructor
 			var n = Math.round(this.Unistrokes[i].Points.length * p);
 			
 			var s = n;
-			var e = n + 10;
+			var e = n + 8;
 			// for (j = 0; j < this.Unistrokes[i].Corner.length; j++) {
 			// 	if (s < this.Unistrokes[i].Corner[j] && this.Unistrokes[i].Corner[j] < e) {
 			// 		e = this.Unistrokes[i].Corner[j] + 1;

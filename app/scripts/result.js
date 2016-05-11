@@ -34,9 +34,9 @@ $(function() {
 			svg.append('path')
 				.attr({
 					'd': line(translatedTemplate),
-					'stroke': strokes[i].Color,
-					'stroke-width': '15px',
-					'stroke-opacity': '0.1',
+					'stroke': '#34495e',
+					'stroke-width': '35px',
+					'stroke-opacity': '0.08',
 					'fill': 'none',
 					'class': 'template'
 				});
@@ -45,21 +45,42 @@ $(function() {
 		result.forEach(function (data){			
 			var translatedPath = data.path.map(function(p){
 				return {
-					X: p.X + offsetX,
+					X: p.X + offsetX +250,
 					Y: p.Y + offsetY
 				}
 			});
 
 			for (var i = 0; i < strokes.length; i++) {
 				if (data.result == strokes[i].Name) {
-					svg.append('path')
+
+					if (data.interface == 'NOGUIDE') {
+						svg.append('path')
 						.attr({
 							'd': line(translatedPath),
-							'stroke': strokes[i].Color,
+							'stroke': '#f1c40f',
 							'stroke-width': '1px',
 							'fill': 'none',
 							'class': 'result'
 						});
+					} else if (data.interface == 'REMAIN') {
+						svg.append('path')
+						.attr({
+							'd': line(translatedPath),
+							'stroke': '#e74c3c',
+							'stroke-width': '1px',
+							'fill': 'none',
+							'class': 'result'
+						});
+					} else {
+						svg.append('path')
+						.attr({
+							'd': line(translatedPath),
+							'stroke': '#3498db',
+							'stroke-width': '1px',
+							'fill': 'none',
+							'class': 'result'
+						});
+					}
 				}
 			}
 		});
