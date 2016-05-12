@@ -25,3 +25,11 @@ input {
 		outline: none;
 	}
 }
+
+html {
+	cursor: crosshair;
+
+	&.none {
+		cursor: none;
+	}
+}

@@ -69,6 +69,7 @@ Menu = function() {
 
 		this.record = new Record(x, y);
 		this.record.record(0, 0);
+		$('html').addClass('none');
 	};
 
 	this.move = function(x, y) {
@@ -122,6 +123,7 @@ Menu = function() {
 			d3.selectAll('.menu-svg .guidance').remove();
 			d3.selectAll('.menu-svg .gesture').remove();
 		}
+		$('html').removeClass('none');
 	};
 
 	function drawGuidance(status, start, cur) {
