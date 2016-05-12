@@ -17,6 +17,7 @@ var line = d3.svg.line()
 					.interpolate('basis');
 
 var recordMode = false;
+var audio = new Audio('assets/pi.ogg');
 
 Record = function(x, y) {
 	this.interface = $('#task-interface').text();
@@ -115,6 +116,8 @@ Menu = function() {
 					'stroke': this.result.Color
 				});
 
+			audio.play();
+
 			window.setTimeout(function (){
 				d3.selectAll('.menu-svg .gesture').remove();
 			}, 1000);
@@ -150,25 +153,6 @@ Menu = function() {
 					Y: element.Y + cur.Y - offsetY
 				};
       })
-
-    //   var tangent = new Array;
-
-    //   if (guide[1]) {
-    //   	var deltaX = guide[1].X - guide[0].X;
-				// var deltaY = guide[1].Y - guide[0].Y;
-
-				// tangent.push({
-				// 	X: guide[0].X,
-				// 	Y: guide[0].Y
-				// });
-
-				// tangent.push({
-				// 	X: guide[0].X + deltaX * guidanceRemaining,
-				// 	Y: guide[0].Y + deltaY * guidanceRemaining
-				// });
-    //   }
-
-      // var tangentMode = 0;
 			
 			if (guide[0]) {
 				canvas.append('circle')
@@ -181,26 +165,6 @@ Menu = function() {
 	      		'class': 'guidance'
 	      	});
 			}
-
-    // 	if (tangentMode) {
-    //   	menu.append('path')
-				// 	.attr({
-				// 		'd': line(tangent),
-				// 		'stroke': value.Color,
-				// 		'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
-				// 		'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
-				// 		'class': 'guidance'
-				// 	});
-    //   } else {
-    //   	menu.append('path')
-				// .attr({
-				// 	'd': line(guide),
-				// 	'stroke': value.Color,
-				// 	'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
-				// 	'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
-				// 	'class': 'guidance'
-				// });
-    //   }
 		});	
 	}
 
