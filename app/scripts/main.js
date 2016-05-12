@@ -19,6 +19,7 @@ var line = d3.svg.line()
 var recordMode = false;
 var modes = ['NOGUIDE', 'REMAIN', 'TANGENT'];
 var guidanceMode = 0;
+var audio = new Audio('assets/pi.ogg');
 
 Record = function(x, y) {
 	this.interface = $('#task-interface').text();
@@ -115,6 +116,8 @@ Menu = function() {
 				.attr({
 					'stroke': this.result.Color
 				});
+
+			audio.play();
 
 			window.setTimeout(function (){
 				d3.selectAll('.menu-svg .gesture').remove();

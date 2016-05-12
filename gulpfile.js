@@ -22,14 +22,20 @@ gulp.task('scripts', function() {
 		.pipe(gulp.dest('public/js/'));
 });
 
+// Copy static assets
+gulp.task('assets', function() {
+	return gulp.src(['app/assets/**'])
+		.pipe(gulp.dest('public/assets/'));
+});
+
 // Clean task
 gulp.task('clean', function() {
-	return del(['public/css', 'public/js']);
+	return del(['public/css', 'public/js', 'public/assets']);
 });
 
 // Default task
 gulp.task('default', ['clean'], function() {  
-	gulp.start('styles', 'scripts');
+	gulp.start('styles', 'scripts', 'assets');
 });
 
 // Watch task
