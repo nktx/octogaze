@@ -68,6 +68,9 @@ Menu = function() {
 
 		this.startPos = this.prevPos = this.curPos = new Point(x, y);
 
+		this.realtime	= recognizer.Realtime(this.gesturePath);
+		drawGuidance(this.realtime.Status, this.startPos, this.curPos);
+
 		this.record = new Record(x, y);
 		this.record.record(0, 0);
 		$('html').addClass('none');
