@@ -164,6 +164,15 @@ Menu = function() {
 	      		'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
 	      		'class': 'guidance'
 	      	});
+
+	      canvas.append('text')
+	      	.attr({
+	      		'dx': guide.slice(-1)[0].X - 5,
+	      		'dy': guide.slice(-1)[0].Y + 5,
+	      		'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
+	      		'class': 'guidance'
+	      	})
+					.text(value.Name);
 			}
 		});	
 	}
