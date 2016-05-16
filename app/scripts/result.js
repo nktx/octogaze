@@ -42,44 +42,48 @@ $(function() {
 				});
 		}
 
-		result.forEach(function (data){			
-			var translatedPath = data.path.map(function(p){
-				return {
-					X: p.X + offsetX +250,
-					Y: p.Y + offsetY
-				}
-			});
+		result.forEach(function (data){
+			if (data.interface == '') {
 
-			for (var i = 0; i < strokes.length; i++) {
-				if (data.result == strokes[i].Name) {
+				var resizedPath = ScaleTo(data.path, 500);
+				var translatedPath = resizedPath.map(function(p){
+					return {
+						X: p.X + offsetX + 250,
+						Y: p.Y + offsetY
+					}
+				});
 
-					if (data.interface == 'NOGUIDE') {
-						svg.append('path')
-						.attr({
-							'd': line(translatedPath),
-							'stroke': '#f1c40f',
-							'stroke-width': '1px',
-							'fill': 'none',
-							'class': 'result'
-						});
-					} else if (data.interface == 'REMAIN') {
-						svg.append('path')
-						.attr({
-							'd': line(translatedPath),
-							'stroke': '#e74c3c',
-							'stroke-width': '1px',
-							'fill': 'none',
-							'class': 'result'
-						});
-					} else {
-						svg.append('path')
-						.attr({
-							'd': line(translatedPath),
-							'stroke': '#3498db',
-							'stroke-width': '1px',
-							'fill': 'none',
-							'class': 'result'
-						});
+				for (var i = 0; i < strokes.length; i++) {
+					if (data.result == strokes[i].Name) {
+
+						if (data.interface == 'NOGUIDE') {
+							svg.append('path')
+							.attr({
+								'd': line(translatedPath),
+								'stroke': '#f1c40f',
+								'stroke-width': '1px',
+								'fill': 'none',
+								'class': 'result'
+							});
+						} else if (data.interface == 'REMAIN') {
+							svg.append('path')
+							.attr({
+								'd': line(translatedPath),
+								'stroke': '#e74c3c',
+								'stroke-width': '1px',
+								'fill': 'none',
+								'class': 'result'
+							});
+						} else {
+							svg.append('path')
+							.attr({
+								'd': line(translatedPath),
+								'stroke': '#3498db',
+								'stroke-width': '1px',
+								'fill': 'none',
+								'class': 'result'
+							});
+						}
 					}
 				}
 			}

@@ -35,8 +35,10 @@ io.on('connection', function(socket){
 			}
 
 			filenames.forEach(function(filename) {
-				var file = 'data/' + filename;
-				data.push(jsonfile.readFileSync(file))
+				if (filename[0] !== '.') {
+					var file = 'data/' + filename;
+					data.push(jsonfile.readFileSync(file))
+				}
 			});
 
 			socket.emit('filedata', data);
