@@ -8,8 +8,8 @@ var jsonfile = require('jsonfile')
 var bodyParser = require('body-parser');
 var app = express();
 
-const server = app.listen(8080, function(){
-  console.log('listening on *:8080');
+const server = app.listen(8000, function(){
+  console.log('listening on *:8000');
 });
 
 const io = require('socket.io')(server);
@@ -62,9 +62,18 @@ app.get('/gazebeacon', function(req, res) {
 	res.render('pages/gazebeacon');
 });
 
+app.get('/gbv1', function(req, res) {
+	res.render('pages/gb1');
+});
+
+app.get('/gbv2', function(req, res) {
+	res.render('pages/gb2');
+});
+
+app.get('/gbv3', function(req, res) {
+	res.render('pages/gb3');
+});
+
 app.get('/gazebeaconr', function(req, res) {
 	res.render('pages/gazebeaconr');
 });
-
-// app.listen(8080);
-// console.log('server listening on port 8080');
