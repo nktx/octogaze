@@ -27,11 +27,7 @@ input {
 }
 
 html {
-	cursor: crosshair;
-
-	&.none {
-		cursor: none;
-	}
+	cursor: none;
 }
 
 text.guidance {

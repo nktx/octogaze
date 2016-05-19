@@ -18,6 +18,7 @@ var line = d3.svg.line()
 
 var recordMode = false;
 var audio = new Audio('assets/pi.ogg');
+var cursorRadius = 25;
 
 Record = function(x, y) {
 	this.interface = $('#task-interface').text();
@@ -73,7 +74,6 @@ Menu = function() {
 
 		this.record = new Record(x, y);
 		this.record.record(0, 0);
-		$('html').addClass('none');
 	};
 
 	this.move = function(x, y) {
@@ -96,8 +96,8 @@ Menu = function() {
   		.append('path')
 			.attr({
 				'd': line([this.prevPos, this.curPos]),
-				'stroke': '#EFEFEF',
-				'stroke-width': '3px',
+				'stroke': '#E6E6E6',
+				'stroke-width': cursorRadius*2,
 				'class': 'gesture'
 			});
 
@@ -129,7 +129,6 @@ Menu = function() {
 			d3.selectAll('.menu-svg .guidance').remove();
 			d3.selectAll('.menu-svg .gesture').remove();
 		}
-		$('html').removeClass('none');
 	};
 
 };
@@ -140,6 +139,17 @@ $(function() {
 	$('#task-interface').text('GAZEBEACON');
 
 	var menu = new Menu();
+
+	canvas
+		.append('circle')
+  	.attr({
+  		'cx': (-1)*cursorRadius,
+  		'cy': (-1)*cursorRadius,
+  		'r': cursorRadius,
+  		'fill': '#000',
+  		'fill-opacity': 0.1,
+  		'class': 'cursor'
+  	});
 
 	$(document).keydown(function(event){
 
@@ -173,5 +183,9 @@ $(function() {
 		if (menu.mode) {
 			menu.move(window.x, window.y);
 		}
+
+		d3.select('.cursor')
+			.attr('cx', window.x)
+			.attr('cy', window.y);
 	});
 });
