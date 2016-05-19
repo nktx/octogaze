@@ -175,11 +175,11 @@ function DollarRecognizer() // constructor
 			
 			var s = n;
 			var e = n + 10;
-			for (j = 0; j < this.Unistrokes[i].Corner.length; j++) {
-				if (s < this.Unistrokes[i].Corner[j] && this.Unistrokes[i].Corner[j] < e) {
-					e = this.Unistrokes[i].Corner[j] + 1;
-				}
-			}
+			// for (j = 0; j < this.Unistrokes[i].Corner.length; j++) {
+			// 	if (s < this.Unistrokes[i].Corner[j] && this.Unistrokes[i].Corner[j] < e) {
+			// 		e = this.Unistrokes[i].Corner[j] + 1;
+			// 	}
+			// }
 			var remain = this.Unistrokes[i].Points.slice(s, e);
 
 			var sub = this.Unistrokes[i].Points.slice(n);

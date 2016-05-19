@@ -5,7 +5,7 @@ function drawGuidance(status, start, cur) {
 	var FillCapacity = 0.5;
 	var FillCapacityThreshold = 0.3;
 
-	var StrokeWidth = 20;
+	var StrokeWidth = 40;
 	var StrokeWidthThresold = 5;
 	var StrokeCapacity = 0.5;
 	var StrokeCapacityThresold = 0.3
@@ -41,8 +41,8 @@ function drawGuidance(status, start, cur) {
 
 			canvas.append('circle')
       	.attr({
-      		'cx': guide.slice(-1)[0].X,
-      		'cy': guide.slice(-1)[0].Y,
+      		'cx': guide.slice(-5)[0].X,
+      		'cy': guide.slice(-5)[0].Y,
       		'r': Math.max(value.Score*(FillSize+FillSizeThreshold)-FillSizeThreshold, 0),
       		'fill': value.Color,
       		'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
@@ -51,8 +51,8 @@ function drawGuidance(status, start, cur) {
 
       canvas.append('text')
       	.attr({
-      		'dx': guide.slice(-1)[0].X - 5,
-      		'dy': guide.slice(-1)[0].Y + 5,
+      		'dx': guide.slice(-5)[0].X - 5,
+      		'dy': guide.slice(-5)[0].Y + 5,
       		'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
       		'class': 'guidance'
       	})

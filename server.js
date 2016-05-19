@@ -62,16 +62,16 @@ app.get('/gazebeacon', function(req, res) {
 	res.render('pages/gazebeacon');
 });
 
-app.get('/gbv1', function(req, res) {
-	res.render('pages/gb1');
+app.get('/line', function(req, res) {
+	res.render('pages/line');
 });
 
-app.get('/gbv2', function(req, res) {
-	res.render('pages/gb2');
+app.get('/corner', function(req, res) {
+	res.render('pages/corner');
 });
 
-app.get('/gbv3', function(req, res) {
-	res.render('pages/gb3');
+app.get('/arc', function(req, res) {
+	res.render('pages/arc');
 });
 
 app.get('/gazebeaconr', function(req, res) {
