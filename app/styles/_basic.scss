@@ -35,3 +35,11 @@ text.guidance {
 	font-size: 20px;
 	font-family: 'Inconsolata';
 }
+
+rect {
+	stroke: #EDEDED;
+	
+	&.hover {
+		stroke: #3D3D3D;
+	}
+}

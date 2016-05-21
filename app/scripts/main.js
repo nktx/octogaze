@@ -62,9 +62,11 @@ Record = function(x, y) {
 };
 
 Menu = function() {
+	this.lock = true;
 	this.mode = false;
 	
 	this.open = function(x, y) {
+		this.lock = false;
 		this.mode = true;
 		this.gesturePath = [];
 		this.gesturePath.push(new Point(0, 0));
@@ -109,6 +111,9 @@ Menu = function() {
 	}
 	
 	this.close = function() {
+		this.lock = true;
+		$('.trigger').removeClass('hover');
+
 		this.mode = false;
 
 		this.result = recognizer.RecognizeR(this.gesturePath);
@@ -153,6 +158,21 @@ $(function() {
   		'class': 'cursor'
   	});
 
+	canvas
+  	.append('rect')
+		.attr({
+  		'x': $(window).width()/2 - 100,
+  		'y': $(window).height()/2 - 100,
+  		'width': 200,
+  		'height': 200, 
+  		'stroke': '#EDEDED',
+  		'stroke-dasharray': ('100, 100'),
+  		'stroke-dashoffset': 50,
+  		'fill': 'none',
+    	'pointer-events': 'all',
+  		'class': 'trigger'
+  	});
+
 	$(document).keydown(function(event){
 
 		// avoid keydown event repeated
@@ -160,7 +180,7 @@ $(function() {
 	  if (!allowed) return;
 	  allowed = false;
 
-		if (event.keyCode == 90) { 
+		if ((event.keyCode == 90) && (menu.lock == false)) { 
 			menu.open(window.x, window.y);
 		}
 
@@ -178,7 +198,7 @@ $(function() {
 	$(document).keyup(function(event){ 
 		allowed = true;
 
-		if (event.keyCode == 90) {
+		if ((event.keyCode == 90) && (menu.lock == false)) { 
 			menu.close();
 		}
 	});
@@ -195,6 +215,22 @@ $(function() {
 			.attr('cx', window.x)
 			.attr('cy', window.y);
 	});
+
+	$('.trigger')
+		.hover(
+			function(){
+				if (menu.mode == false) {
+					$(this).addClass('hover');
+					menu.lock = false;
+				}
+			},
+			function(){
+				if (menu.mode == false) {
+					$(this).removeClass('hover');
+					menu.lock = true;
+				}
+			}
+		);
 });
 
 function drawGuidance(status, start, cur) {
