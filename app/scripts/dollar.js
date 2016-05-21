@@ -99,6 +99,18 @@ function Unistroke(color, name, points) // constructor
 	this.Color = color;
 	this.Corner = FindCorner(this.Original, this.Points);
 }
+function UnistrokeU(color, name, points) // constructor
+{
+	this.Name = name;
+	this.Points = Resample(points, NumPoints);
+	var radians = IndicativeAngle(this.Points);
+	// this.Points = RotateBy(this.Points, -radians);
+	this.Points = ScaleTo(this.Points, SquareSize);
+	this.Points = TranslateTo(this.Points, Origin);
+	this.Vector = Vectorize(this.Points); // for Protractor
+	this.Length = PathLength(points);
+	this.Color = color;
+}
 function UnistrokeR(color, name, points) // constructor
 {
 	this.Name = name;
@@ -146,6 +158,7 @@ function DollarRecognizer() // constructor
 
 	// The unistrokes of the recognizer will be defined in separate files for different user study modes.
 	this.Unistrokes = new Array();
+	this.UnistrokesU = new Array();
 	this.UnistrokesR = new Array();
 
 	//
@@ -216,6 +229,31 @@ function DollarRecognizer() // constructor
 		}
 		return (u == -1) ? new Result("#EFEFEF", "No match.", 0.0) : new Result(this.Unistrokes[u].Color, this.Unistrokes[u].Name, useProtractor ? 1.0 / b : 1.0 - b / HalfDiagonal);
 	};
+	this.RecognizeNoRotate = function(points, useProtractor)
+	{
+		points = Resample(points, NumPoints);
+		var radians = IndicativeAngle(points);
+		// points = RotateBy(points, -radians);
+		points = ScaleTo(points, SquareSize);
+		points = TranslateTo(points, Origin);
+		var vector = Vectorize(points); // for Protractor
+
+		var b = +Infinity;
+		var u = -1;
+		for (var i = 0; i < this.UnistrokesU.length; i++) // for each unistroke
+		{
+			var d;
+			if (useProtractor) // for Protractor
+				d = OptimalCosineDistance(this.UnistrokesU[i].Vector, vector);
+			else // Golden Section Search (original $1)
+				d = DistanceAtBestAngle(points, this.UnistrokesU[i], -AngleRange, +AngleRange, AnglePrecision);
+			if (d < b) {
+				b = d; // best (least) distance
+				u = i; // unistroke
+			}
+		}
+		return (u == -1) ? new Result("#EFEFEF", "No match.", 0.0) : new Result(this.UnistrokesU[u].Color, this.UnistrokesU[u].Name, useProtractor ? 1.0 / b : 1.0 - b / HalfDiagonal);
+	};
 	this.RecognizeR = function(points, useProtractor)
 	{
 		points = Resample(points, NumPoints);
@@ -244,6 +282,7 @@ function DollarRecognizer() // constructor
 	this.AddGesture = function(color, name, points)
 	{
 		this.Unistrokes[this.Unistrokes.length] = new Unistroke(color, name, points); // append new unistroke
+		this.UnistrokesU[this.UnistrokesU.length] = new UnistrokeU(color, name, points);
 		this.UnistrokesR[this.UnistrokesR.length] = new UnistrokeR(color, name, points);
 
 		// var num = 0;
@@ -256,6 +295,7 @@ function DollarRecognizer() // constructor
 	this.DeleteUserGestures = function()
 	{
 		this.Unistrokes.length = NumUnistrokes; // clear any beyond the original set
+		this.UnistrokesU.length = NumUnistrokes;
 		this.UnistrokesR.length = NumUnistrokes;
 		return NumUnistrokes;
 	}
