@@ -162,7 +162,7 @@ function DollarRecognizer() // constructor
 	//
 	this.Realtime = function(points)
 	{
-		points = Resample(points, NumPoints);
+		points = Resample(points, NumPoints/4);
 
 		var length = PathLength(points);
 		var angle = IndicativeAngle(points);
@@ -172,15 +172,8 @@ function DollarRecognizer() // constructor
 		for (var i = 0; i < this.Unistrokes.length; i++) {
 			var p = length/PathLength(this.Unistrokes[i].Points);
 			var n = Math.round(this.Unistrokes[i].Points.length * p);
-			
-			var s = n;
-			var e = n + 10;
-			// for (j = 0; j < this.Unistrokes[i].Corner.length; j++) {
-			// 	if (s < this.Unistrokes[i].Corner[j] && this.Unistrokes[i].Corner[j] < e) {
-			// 		e = this.Unistrokes[i].Corner[j] + 1;
-			// 	}
-			// }
-			var remain = this.Unistrokes[i].Points.slice(s, e);
+
+			var remain = this.Unistrokes[i].Points.slice(n, n+10);
 
 			var sub = this.Unistrokes[i].Points.slice(n);
 			var perf = points.concat(sub);
