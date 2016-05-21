@@ -125,7 +125,7 @@ function Result(color, name, score) // constructor
 //
 
 // var NumUnistrokes = 16;
-var NumUnistrokes = 4;
+var NumUnistrokes = 0;
 
 var NumPoints = 64;
 var SquareSize = 250.0;
@@ -256,6 +256,7 @@ function DollarRecognizer() // constructor
 	this.DeleteUserGestures = function()
 	{
 		this.Unistrokes.length = NumUnistrokes; // clear any beyond the original set
+		this.UnistrokesR.length = NumUnistrokes;
 		return NumUnistrokes;
 	}
 }

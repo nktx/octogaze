@@ -24,6 +24,7 @@ var cursorRadius = 20;
 
 Record = function(x, y) {
 	this.interface = location.pathname.slice(1).toUpperCase() + $('#task-interface').text();
+	this.gesture = $('#task-gesture').text();
 	this.subject = $('#task-subject').val();
 	this.result = "";
 	this.score = 0;
@@ -173,6 +174,11 @@ $(function() {
   		'class': 'trigger'
   	});
 
+	// Initial first gesture
+  $('#task-gesture').text(gestures[gestureIndex].Name);
+	recognizer.DeleteUserGestures();
+	recognizer.AddGesture(gestures[gestureIndex].Color, gestures[gestureIndex].Name, gestures[gestureIndex].Points);
+
 	$(document).keydown(function(event){
 
 		// avoid keydown event repeated
@@ -192,6 +198,14 @@ $(function() {
     if (event.keyCode == 80) {
     	guidanceMode = (guidanceMode+1)%3;
     	$('#task-interface').text(modes[guidanceMode]);
+    }
+
+    if (event.keyCode == 71) {
+    	gestureIndex = (gestureIndex+1)%(gestures.length);
+    	$('#task-gesture').text(gestures[gestureIndex].Name);
+
+			recognizer.DeleteUserGestures();
+    	recognizer.AddGesture(gestures[gestureIndex].Color, gestures[gestureIndex].Name, gestures[gestureIndex].Points);
     }
 	});
 
