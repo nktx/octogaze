@@ -53,14 +53,14 @@ Record = function(x, y) {
 		$('#task-duration').text(this.duration);
 
 		if (location.pathname.slice(1) == 'line'){
-			if (su !== 0) {
+			if (su > 0) {
 				this.resultnorotate = ru;
 				$('#task-result').text(this.resultnorotate + '(' + this.scorenorotate + ')');
 			} else {
 				$('#task-result').text('-');
 			}
 		} else {
-			if (s !== 0) {
+			if (s > 0) {
 				this.result = r;
 				$('#task-result').text(this.result + '(' + this.score + ')');
 			} else {
@@ -132,7 +132,7 @@ Menu = function() {
 		this.mode = false;
 
 		var gesturePathCopy = JSON.parse(JSON.stringify(this.gesturePath));
-		
+
 		this.result = recognizer.RecognizeR(this.gesturePath);
 		this.resultNoRotate = recognizer.RecognizeNoRotate(gesturePathCopy);
 		this.record.end(this.result.Name, this.result.Score, this.resultNoRotate.Name, this.resultNoRotate.Score);
