@@ -173,7 +173,7 @@ function DollarRecognizer() // constructor
 			var p = length/PathLength(this.Unistrokes[i].Points);
 			var n = Math.round(this.Unistrokes[i].Points.length * p);
 
-			var remain = this.Unistrokes[i].Points.slice(n, n+10);
+			var remain = this.Unistrokes[i].Points.slice(n, n+15);
 
 			var sub = this.Unistrokes[i].Points.slice(n);
 			var perf = points.concat(sub);

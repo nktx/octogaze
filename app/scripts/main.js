@@ -17,11 +17,13 @@ var line = d3.svg.line()
 					.interpolate('basis');
 
 var recordMode = false;
+var modes = ['NOGUIDE', '1FFW', '2FFW'];
+var guidanceMode = 0;
 var audio = new Audio('assets/pi.ogg');
 var cursorRadius = 25;
 
 Record = function(x, y) {
-	this.interface = $('#task-interface').text();
+	this.interface = location.pathname.slice(1).toUpperCase() + $('#task-interface').text();
 	this.subject = $('#task-subject').val();
 	this.result = "";
 	this.score = 0;
@@ -136,7 +138,7 @@ Menu = function() {
 $(function() {
 
 	var allowed = true;
-	$('#task-interface').text('GAZEBEACON');
+	$('#task-interface').text('NOGUIDE');
 
 	var menu = new Menu();
 
@@ -166,6 +168,11 @@ $(function() {
 			recordMode = !recordMode;
     	$('#record-mode').text( recordMode ? 'ON' : 'OFF');
     }
+
+    if (event.keyCode == 80) {
+    	guidanceMode = (guidanceMode+1)%3;
+    	$('#task-interface').text(modes[guidanceMode]);
+    }
 	});
 
 	$(document).keyup(function(event){ 
@@ -189,3 +196,79 @@ $(function() {
 			.attr('cy', window.y);
 	});
 });
+
+function drawGuidance(status, start, cur) {
+
+	var FillSize = 20;
+	var FillSizeThreshold = 5;
+	var FillCapacity = 0.5;
+	var FillCapacityThreshold = 0.3;
+
+	var StrokeWidth = 40;
+	var StrokeWidthThresold = 5;
+	var StrokeCapacity = 0.5;
+	var StrokeCapacityThresold = 0.3
+
+	canvas.selectAll('.menu-svg .guidance').remove();
+
+	$.each(status, function(index, value) {
+		var offsetX = 0;
+		var offsetY = 0;
+
+		if (value.Subtract[0]) {
+			offsetX = value.Subtract[0].X;
+			offsetY = value.Subtract[0].Y;
+		}
+
+		var guide = value.Subtract.map(function(element){
+			return {
+				X: element.X + cur.X - offsetX,
+				Y: element.Y + cur.Y - offsetY
+			};
+    })
+		
+		if (guide[0]) {
+
+			if (guidanceMode == 1) {
+				canvas.append('path')
+				.attr({
+					'd': line(guide.slice(0,11)),
+					'stroke': value.Color,
+					'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
+					'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
+					'class': 'guidance'
+				});
+			} else if (guidanceMode == 2) {
+				canvas.append('path')
+				.attr({
+					'd': line(guide),
+					'stroke': value.Color,
+					'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
+					'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
+					'class': 'guidance'
+				});
+			}
+
+			if (guidanceMode !== 0) {
+				canvas.append('circle')
+	      	.attr({
+	      		'cx': guide.slice(-5)[0].X,
+	      		'cy': guide.slice(-5)[0].Y,
+	      		'r': Math.max(value.Score*(FillSize+FillSizeThreshold)-FillSizeThreshold, 0),
+	      		'fill': value.Color,
+	      		'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
+	      		'class': 'guidance'
+	      	});
+
+	      canvas.append('text')
+	      	.attr({
+	      		'dx': guide.slice(-5)[0].X - 5,
+	      		'dy': guide.slice(-5)[0].Y + 5,
+	      		'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
+	      		'class': 'guidance'
+	      	})
+					.text(value.Name);
+			}
+		}
+	});	
+}
