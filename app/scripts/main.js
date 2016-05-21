@@ -20,7 +20,7 @@ var recordMode = false;
 var modes = ['NOGUIDE', '1FFW', '2FFW'];
 var guidanceMode = 0;
 var audio = new Audio('assets/pi.ogg');
-var cursorRadius = 25;
+var cursorRadius = 20;
 
 Record = function(x, y) {
 	this.interface = location.pathname.slice(1).toUpperCase() + $('#task-interface').text();
@@ -98,7 +98,7 @@ Menu = function() {
   		.append('path')
 			.attr({
 				'd': line([this.prevPos, this.curPos]),
-				'stroke': '#E6E6E6',
+				'stroke': '#EDEDED',
 				'stroke-width': cursorRadius*2,
 				'class': 'gesture'
 			});
@@ -118,14 +118,15 @@ Menu = function() {
 			d3.selectAll('.menu-svg .guidance').remove();
 			d3.selectAll('.menu-svg .gesture')
 				.attr({
-					'stroke': this.result.Color
+					'stroke': this.result.Color,
+					'stroke-width': 5,
 				});
 
 			audio.play();
 
 			window.setTimeout(function (){
 				d3.selectAll('.menu-svg .gesture').remove();
-			}, 1000);
+			}, 500);
 
 		} else {
 			d3.selectAll('.menu-svg .guidance').remove();
@@ -148,8 +149,7 @@ $(function() {
   		'cx': (-1)*cursorRadius,
   		'cy': (-1)*cursorRadius,
   		'r': cursorRadius,
-  		'fill': '#000',
-  		'fill-opacity': 0.1,
+  		'fill': '#EDEDED',
   		'class': 'cursor'
   	});
 
