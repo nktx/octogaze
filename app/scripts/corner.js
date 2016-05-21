@@ -1,0 +1,4 @@
+recognizer.AddGesture("#3498DB", "RR", new Array(new Point(0,0), new Point(SquareSize,0), new Point(SquareSize,SquareSize), new Point(0,SquareSize), new Point(0,0)));
+recognizer.AddGesture("#E74C3C", "LR", new Array(new Point(0,0), new Point(SquareSize*(-1),0), new Point(SquareSize*(-1),SquareSize), new Point(0,SquareSize), new Point(0,0)));
+recognizer.AddGesture("#2ECC71", "RT", new Array(new Point(0,0), new Point(SquareSize/2,SquareSize*(-1)), new Point(SquareSize,0), new Point(0,0)));
+recognizer.AddGesture("#F1C40F", "LT", new Array(new Point(0,0), new Point(SquareSize*(-1)/2,SquareSize*(-1)), new Point(SquareSize*(-1),0), new Point(0,0)));

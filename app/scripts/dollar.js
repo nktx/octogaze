@@ -143,19 +143,10 @@ function DollarRecognizer() // constructor
 	//
 	// one built-in unistroke per gesture type
 	//
-	this.Unistrokes = new Array(NumUnistrokes);
-	this.Unistrokes[0] = new Unistroke("#E74C3C", "L", new Array(new Point(0,0), new Point(0,SquareSize), new Point(SquareSize,SquareSize)));
-	this.Unistrokes[1] = new Unistroke("#F1C40F", "Z", new Array(new Point(0,0), new Point(SquareSize,0), new Point(0,SquareSize), new Point(SquareSize,SquareSize)));
-	this.Unistrokes[2] = new Unistroke("#2ECC71", "M", new Array(new Point(0,0), new Point(0,SquareSize*(-1)), new Point(SquareSize/2,0), new Point(SquareSize,SquareSize*(-1)), new Point(SquareSize,0)));
-	this.Unistrokes[3] = new Unistroke("#3498DB", "A", new Array(new Point(0,0), new Point(SquareSize/2,SquareSize*(-1)), new Point(SquareSize,0)));
 
-	this.UnistrokesR = new Array(NumUnistrokes);
-	this.UnistrokesR[0] = new UnistrokeR("#E74C3C", "L", new Array(new Point(0,0), new Point(0,SquareSize), new Point(SquareSize,SquareSize)));
-	this.UnistrokesR[1] = new UnistrokeR("#F1C40F", "Z", new Array(new Point(0,0), new Point(SquareSize,0), new Point(0,SquareSize), new Point(SquareSize,SquareSize)));
-	this.UnistrokesR[2] = new UnistrokeR("#2ECC71", "M", new Array(new Point(0,0), new Point(0,SquareSize*(-1)), new Point(SquareSize/2,0), new Point(SquareSize,SquareSize*(-1)), new Point(SquareSize,0)));
-	this.UnistrokesR[3] = new UnistrokeR("#3498DB", "A", new Array(new Point(0,0), new Point(SquareSize/2,SquareSize*(-1)), new Point(SquareSize,0)));
-
-	// colors = ['#E74C3C', '#E67E22', '#F1C40F', '#2ECC71', '#1CC9A8', '#3498DB', '#9B59B6'];
+	// The unistrokes of the recognizer will be defined in separate files for different user study modes.
+	this.Unistrokes = new Array();
+	this.UnistrokesR = new Array();
 
 	//
 	// The $1 Gesture Recognizer API begins here -- 3 methods: Recognize(), AddGesture(), and DeleteUserGestures()
@@ -250,15 +241,17 @@ function DollarRecognizer() // constructor
 		}
 		return (u == -1) ? new Result("#EFEFEF", "No match.", 0.0) : new Result(this.UnistrokesR[u].Color, this.UnistrokesR[u].Name, useProtractor ? 1.0 / b : 1.0 - b / HalfDiagonal);
 	};
-	this.AddGesture = function(name, points)
+	this.AddGesture = function(color, name, points)
 	{
-		this.Unistrokes[this.Unistrokes.length] = new Unistroke(name, points); // append new unistroke
-		var num = 0;
-		for (var i = 0; i < this.Unistrokes.length; i++) {
-			if (this.Unistrokes[i].Name == name)
-				num++;
-		}
-		return num;
+		this.Unistrokes[this.Unistrokes.length] = new Unistroke(color, name, points); // append new unistroke
+		this.UnistrokesR[this.UnistrokesR.length] = new UnistrokeR(color, name, points);
+
+		// var num = 0;
+		// for (var i = 0; i < this.Unistrokes.length; i++) {
+		// 	if (this.Unistrokes[i].Name == name)
+		// 		num++;
+		// }
+		// return num;
 	}
 	this.DeleteUserGestures = function()
 	{
