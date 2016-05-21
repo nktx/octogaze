@@ -256,10 +256,10 @@ function drawGuidance(status, start, cur) {
 			offsetY = value.Subtract[0].Y;
 		}
 
-		var guide = value.Subtract.map(function(element){
+		var guide = value.Subtract.map(function(element, index){
 			return {
-				X: element.X + cur.X - offsetX,
-				Y: element.Y + cur.Y - offsetY
+				X: element.X + cur.X - offsetX - (cur.X - offsetX - start.X)*index/9 ,
+				Y: element.Y + cur.Y - offsetY - (cur.Y - offsetY - start.Y)*index/9
 			};
     })
 		
