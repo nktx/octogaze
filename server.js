@@ -35,8 +35,10 @@ io.on('connection', function(socket){
 			}
 
 			filenames.forEach(function(filename) {
-				var file = 'data/' + filename;
-				data.push(jsonfile.readFileSync(file))
+				if (filename[0] !== '.') {
+					var file = 'data/' + filename;
+					data.push(jsonfile.readFileSync(file))
+				}
 			});
 
 			socket.emit('filedata', data);
@@ -74,6 +76,6 @@ app.get('/arc', function(req, res) {
 	res.render('pages/arc');
 });
 
-app.get('/gazebeaconr', function(req, res) {
-	res.render('pages/gazebeaconr');
+app.get('/result', function(req, res) {
+	res.render('pages/result');
 });
