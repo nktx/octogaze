@@ -307,14 +307,33 @@ function drawGuidance(status, start, cur) {
 		if (guide[0]) {
 
 			if (guidanceMode == 1) {
+				var guide1ffw = guide.slice(0,11);
+
 				canvas.append('path')
 				.attr({
-					'd': line(guide.slice(0,11)),
+					'd': line(guide1ffw),
 					'stroke': value.Color,
 					'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
 					'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
 					'class': 'guidance'
 				});
+				canvas.append('circle')
+	      	.attr({
+	      		'cx': guide1ffw.slice(-1)[0].X,
+	      		'cy': guide1ffw.slice(-1)[0].Y,
+	      		'r': Math.max(value.Score*(FillSize+FillSizeThreshold)-FillSizeThreshold, 0),
+	      		'fill': value.Color,
+	      		'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
+	      		'class': 'guidance'
+	      	});
+	      canvas.append('text')
+	      	.attr({
+	      		'dx': guide1ffw.slice(-1)[0].X - 5,
+	      		'dy': guide1ffw.slice(-1)[0].Y + 5,
+	      		'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
+	      		'class': 'guidance'
+	      	})
+					.text(value.Name);
 			} else if (guidanceMode == 2) {
 				canvas.append('path')
 				.attr({
@@ -324,9 +343,6 @@ function drawGuidance(status, start, cur) {
 					'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
 					'class': 'guidance'
 				});
-			}
-
-			if (guidanceMode !== 0) {
 				canvas.append('circle')
 	      	.attr({
 	      		'cx': guide.slice(-5)[0].X,
@@ -336,7 +352,6 @@ function drawGuidance(status, start, cur) {
 	      		'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
 	      		'class': 'guidance'
 	      	});
-
 	      canvas.append('text')
 	      	.attr({
 	      		'dx': guide.slice(-5)[0].X - 5,
