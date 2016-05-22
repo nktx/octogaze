@@ -224,6 +224,10 @@ $(function() {
 
     if (event.keyCode == 71) {
     	setTaskCounter(0);
+
+			guidanceMode = 0;
+    	$('#task-interface').text(modes[guidanceMode]);
+
     	gestureIndex = (gestureIndex+1)%(gestures.length);
     	$('#task-gesture').text(gestures[gestureIndex].Name);
 
