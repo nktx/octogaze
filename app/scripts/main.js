@@ -22,6 +22,8 @@ var guidanceMode = 0;
 var audio = new Audio('assets/pi.ogg');
 var cursorRadius = 20;
 
+var taskCompleted = 0;
+
 Record = function(x, y) {
 	this.interface = location.pathname.slice(1).toUpperCase() + $('#task-interface').text();
 	this.gesture = $('#task-gesture').text();
@@ -72,6 +74,7 @@ Record = function(x, y) {
 		console.log(this);
 		if (recordMode) {
 			socket.emit('record', this);
+			setTaskCounter(1);
 		}
 	};
 };
@@ -208,16 +211,19 @@ $(function() {
 		}
 
     if (event.keyCode == 82) {
+    	setTaskCounter(0);
 			recordMode = !recordMode;
     	$('#record-mode').text( recordMode ? 'ON' : 'OFF');
     }
 
     if (event.keyCode == 80) {
+    	setTaskCounter(0)
     	guidanceMode = (guidanceMode+1)%3;
     	$('#task-interface').text(modes[guidanceMode]);
     }
 
     if (event.keyCode == 71) {
+    	setTaskCounter(0);
     	gestureIndex = (gestureIndex+1)%(gestures.length);
     	$('#task-gesture').text(gestures[gestureIndex].Name);
 
@@ -338,4 +344,13 @@ function drawGuidance(status, start, cur) {
 			}
 		}
 	});	
+}
+
+function setTaskCounter(p) {
+	if (p == 0) {
+		taskCompleted = 0;
+	} else {
+		taskCompleted += p;
+	}
+	$('.progress').css('width', Math.min(100, taskCompleted*20) + '%');
 }

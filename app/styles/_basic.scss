@@ -5,6 +5,20 @@
 	margin-top: 10px;
 }
 
+.progress-bar {
+	height: 4px;
+	width: 100%;
+
+	.progress {
+		background-color: #34495e;
+		border-top-right-radius: 2px;
+		border-bottom-right-radius: 2px;
+		height: 4px;
+		width: 0%;
+		transition: 0.5s;
+	}
+}
+
 .title {
 	width: 85px;
 	display: inline-block;
