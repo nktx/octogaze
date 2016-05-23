@@ -8,12 +8,12 @@ function toRadians (angle) {
 var clockwise = new Array;
 var counterclockwise = new Array;
 
-for (var i = 0; i <= 330; i += 10) {
-	clockwise.push(new Point((SquareSize/2)*Math.cos(toRadians(i)) - SquareSize/2, (SquareSize/2)*Math.sin(toRadians(i))));
+for (var i = 90; i <= 450; i += 10) {
+	clockwise.push(new Point((SquareSize/2)*Math.cos(toRadians(i)), (SquareSize/2)*Math.sin(toRadians(i)) - SquareSize/2 ));
 }
 
-for (var i = 180; i >= -150; i -= 10) {
-	counterclockwise.push(new Point((SquareSize/2)*Math.cos(toRadians(i)) + SquareSize/2, (SquareSize/2)*Math.sin(toRadians(i))));
+for (var i = 90; i >= -270; i -= 10) {
+	counterclockwise.push(new Point((SquareSize/2)*Math.cos(toRadians(i)), (SquareSize/2)*Math.sin(toRadians(i)) - SquareSize/2 ));
 }
 
 gestures.push({
