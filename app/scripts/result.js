@@ -104,16 +104,16 @@ $(function() {
 
 			var pathColor = '';
 
-			if (data.interface.slice(-4)[0] == '2') {
+			if (data.guide == '2FFW') {
 				pathColor = '#3498DB';
-			} else if (data.interface.slice(-4)[0] == '1'){
+			} else if (data.guide == '1FFW'){
 				pathColor = '#E74C3C';
 			}	else {
 				pathColor = '#F1C40F';
 			}
 
 			for (var i = 0; i < strokes.length; i++) {
-				if (data.result == strokes[i].Name) {
+				if ((data.result == strokes[i].Name) || (data.resultnorotate == strokes[i].Name)) {
 					svg.append('path')
 						.attr({
 							'd': line(translatedPath),

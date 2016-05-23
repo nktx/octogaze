@@ -25,7 +25,8 @@ var cursorRadius = 20;
 var taskCompleted = 0;
 
 Record = function(x, y) {
-	this.interface = location.pathname.slice(1).toUpperCase() + $('#task-interface').text();
+	this.interface = location.pathname.slice(1).toUpperCase();
+	this.guide = $('#task-interface').text();
 	this.gesture = $('#task-gesture').text();
 	this.subject = $('#task-subject').val();
 	this.result = "";
