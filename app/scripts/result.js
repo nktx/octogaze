@@ -56,6 +56,8 @@ $(function() {
 		var offsetX = $(window).width()/2;
 		var offsetY = $(window).height()/2;
 
+		var displayInterface = 'LINE';
+
 		svg
 			.append('circle')
 	  	.attr({
@@ -67,7 +69,7 @@ $(function() {
 	  	});
 
 	  result.forEach(function (data){
-			if (!presence[data.gesture]){
+			if ((!presence[data.gesture]) && (data.interface == displayInterface)){
 				presence[data.gesture] = true;
 			}
 	  });
@@ -95,33 +97,37 @@ $(function() {
 		}
 
 		result.forEach(function (data){
-			var translatedPath = data.path.map(function(p){
-				return {
-					X: p.X + offsetX,
-					Y: p.Y + offsetY
+
+			if (data.interface == displayInterface) {
+				var resizedPath = ScaleTo(data.path, 250);				
+				var translatedPath = resizedPath.map(function(p){
+					return {
+						X: p.X + offsetX,
+						Y: p.Y + offsetY
+					}
+				});
+
+				var pathColor = '';
+
+				if (data.guide == '2FFW') {
+					pathColor = '#3498DB';
+				} else if (data.guide == '1FFW'){
+					pathColor = '#E74C3C';
+				}	else {
+					pathColor = '#F1C40F';
 				}
-			});
 
-			var pathColor = '';
-
-			if (data.guide == '2FFW') {
-				pathColor = '#3498DB';
-			} else if (data.guide == '1FFW'){
-				pathColor = '#E74C3C';
-			}	else {
-				pathColor = '#F1C40F';
-			}
-
-			for (var i = 0; i < strokes.length; i++) {
-				if ((data.result == strokes[i].Name) || (data.resultnorotate == strokes[i].Name)) {
-					svg.append('path')
-						.attr({
-							'd': line(translatedPath),
-							'stroke': pathColor,
-							'stroke-width': '1px',
-							'fill': 'none',
-							'class': 'result'
-						});
+				for (var i = 0; i < strokes.length; i++) {
+					if ((data.result == strokes[i].Name) || (data.resultnorotate == strokes[i].Name)) {
+						svg.append('path')
+							.attr({
+								'd': line(translatedPath),
+								'stroke': pathColor,
+								'stroke-width': '1px',
+								'fill': 'none',
+								'class': 'result'
+							});
+					}
 				}
 			}
 		});
