@@ -329,7 +329,7 @@ function drawGuidance(status, start, cur) {
 	      	});
 	      canvas.append('text')
 	      	.attr({
-	      		'dx': guide1ffw.slice(-1)[0].X - 5,
+	      		'dx': guide1ffw.slice(-1)[0].X - 8,
 	      		'dy': guide1ffw.slice(-1)[0].Y + 5,
 	      		'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
 	      		'class': 'guidance'
@@ -355,7 +355,7 @@ function drawGuidance(status, start, cur) {
 	      	});
 	      canvas.append('text')
 	      	.attr({
-	      		'dx': guide.slice(-5)[0].X - 5,
+	      		'dx': guide.slice(-5)[0].X - 8,
 	      		'dy': guide.slice(-5)[0].Y + 5,
 	      		'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
 	      		'class': 'guidance'
