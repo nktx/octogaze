@@ -305,7 +305,7 @@ function drawGuidance(status, start, cur) {
 			};
     })
 		
-		if (guide[0]) {
+		if (guide.length >= 5) {
 
 			if (guidanceMode == 1) {
 				var guide1ffw = guide.slice(0,11);
