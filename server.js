@@ -79,3 +79,7 @@ app.get('/arc', function(req, res) {
 app.get('/result', function(req, res) {
 	res.render('pages/result');
 });
+
+app.get('/resample-test', function(req, res) {
+	res.render('pages/resample-test');
+});
