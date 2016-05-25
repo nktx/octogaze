@@ -17,7 +17,7 @@ var line = d3.svg.line()
 					.interpolate('basis');
 
 var recordMode = false;
-var modes = ['NOGUIDE', '1FFW', '2FFW'];
+var modes = ['ORIGINAL', 'SMOOTH', 'PSMOOTH'];
 var guidanceMode = 0;
 var audio = new Audio('assets/pi.ogg');
 var cursorRadius = 20;
@@ -166,7 +166,7 @@ Menu = function() {
 $(function() {
 
 	var allowed = true;
-	$('#task-interface').text('NOGUIDE');
+	$('#task-interface').text('ORIGINAL');
 
 	var menu = new Menu();
 
@@ -305,14 +305,14 @@ function drawGuidance(status, start, cur) {
 			};
     })
 
-		var guidec = value.Subtract.map(function(element, index){
+		var guide = value.Subtract.map(function(element, index){
 			return {
 				X: element.X + cur.X - offsetX - (cur.X - offsetX - start.X)*index/9 ,
 				Y: element.Y + cur.Y - offsetY - (cur.Y - offsetY - start.Y)*index/9
 			};
     })
 
-		var guide = value.Subtract.map(function(element, index){
+		var guidep = value.Subtract.map(function(element, index){
 			return {
 				X: element.X + cur.X - offsetX - (1 - value.Proportion*value.Proportion)*(cur.X - offsetX - start.X)*index/9 ,
 				Y: element.Y + cur.Y - offsetY - (1 - value.Proportion*value.Proportion)*(cur.Y - offsetY - start.Y)*index/9
@@ -320,59 +320,6 @@ function drawGuidance(status, start, cur) {
     })
 		
 		if (guide.length >= 5) {
-
-			canvas.append('path')
-				.attr({
-					'd': line(guideo),
-					'stroke': '#DDD',
-					'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
-					'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
-					'class': 'guidance'
-				});
-				canvas.append('circle')
-	      	.attr({
-	      		'cx': guideo.slice(-1)[0].X,
-	      		'cy': guideo.slice(-1)[0].Y,
-	      		'r': Math.max(value.Score*(FillSize+FillSizeThreshold)-FillSizeThreshold, 0),
-	      		'fill': '#AAA',
-	      		'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
-	      		'class': 'guidance'
-	      	});
-	      canvas.append('text')
-	      	.attr({
-	      		'dx': guideo.slice(-1)[0].X - 8,
-	      		'dy': guideo.slice(-1)[0].Y + 5,
-	      		'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
-	      		'class': 'guidance'
-	      	})
-					.text(value.Name);
-
-				canvas.append('path')
-				.attr({
-					'd': line(guidec),
-					'stroke': '#999',
-					'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
-					'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
-					'class': 'guidance'
-				});
-				canvas.append('circle')
-	      	.attr({
-	      		'cx': guidec.slice(-1)[0].X,
-	      		'cy': guidec.slice(-1)[0].Y,
-	      		'r': Math.max(value.Score*(FillSize+FillSizeThreshold)-FillSizeThreshold, 0),
-	      		'fill': '#666',
-	      		'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
-	      		'class': 'guidance'
-	      	});
-	      canvas.append('text')
-	      	.attr({
-	      		'dx': guidec.slice(-1)[0].X - 8,
-	      		'dy': guidec.slice(-1)[0].Y + 5,
-	      		'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
-	      		'class': 'guidance'
-	      	})
-					.text(value.Name);
-
 			if (guidanceMode == 1) {
 				var guide1ffw = guide.slice(0,11);
 
@@ -402,9 +349,11 @@ function drawGuidance(status, start, cur) {
 	      	})
 					.text(value.Name);
 			} else if (guidanceMode == 2) {
+				var guide1ffw = guidep.slice(0,11);
+
 				canvas.append('path')
 				.attr({
-					'd': line(guide),
+					'd': line(guide1ffw),
 					'stroke': value.Color,
 					'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
 					'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
@@ -412,8 +361,8 @@ function drawGuidance(status, start, cur) {
 				});
 				canvas.append('circle')
 	      	.attr({
-	      		'cx': guide.slice(-5)[0].X,
-	      		'cy': guide.slice(-5)[0].Y,
+	      		'cx': guide1ffw.slice(-1)[0].X,
+	      		'cy': guide1ffw.slice(-1)[0].Y,
 	      		'r': Math.max(value.Score*(FillSize+FillSizeThreshold)-FillSizeThreshold, 0),
 	      		'fill': value.Color,
 	      		'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
@@ -421,8 +370,36 @@ function drawGuidance(status, start, cur) {
 	      	});
 	      canvas.append('text')
 	      	.attr({
-	      		'dx': guide.slice(-5)[0].X - 8,
-	      		'dy': guide.slice(-5)[0].Y + 5,
+	      		'dx': guide1ffw.slice(-1)[0].X - 8,
+	      		'dy': guide1ffw.slice(-1)[0].Y + 5,
+	      		'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
+	      		'class': 'guidance'
+	      	})
+					.text(value.Name);
+			} else {
+				var guide1ffw = guideo.slice(0,11);
+
+				canvas.append('path')
+				.attr({
+					'd': line(guide1ffw),
+					'stroke': value.Color,
+					'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
+					'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
+					'class': 'guidance'
+				});
+				canvas.append('circle')
+	      	.attr({
+	      		'cx': guide1ffw.slice(-1)[0].X,
+	      		'cy': guide1ffw.slice(-1)[0].Y,
+	      		'r': Math.max(value.Score*(FillSize+FillSizeThreshold)-FillSizeThreshold, 0),
+	      		'fill': value.Color,
+	      		'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
+	      		'class': 'guidance'
+	      	});
+	      canvas.append('text')
+	      	.attr({
+	      		'dx': guide1ffw.slice(-1)[0].X - 8,
+	      		'dy': guide1ffw.slice(-1)[0].Y + 5,
 	      		'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
 	      		'class': 'guidance'
 	      	})
