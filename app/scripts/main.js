@@ -245,30 +245,17 @@ $(function() {
 		}
 	});
 
-	var euroX = OneEuroFilter(25, 1, 1, 1);
-	var euroY = OneEuroFilter(25, 1, 1, 1);
-
-	var lastMove = 0;
-
 	$(document).mousemove(function(e) {
-		if (Date.now() - lastMove > 40) {
-			// window.x = e.pageX;
-			// window.y = e.pageY;
-			// console.log(euroX.filter(e.pageX, Date.now()), euroY.filter(e.pageY, Date.now()));
-	 
-	    window.x = euroX.filter(e.pageX, new Date().getTime()*0.001);
-	    window.y = euroY.filter(e.pageY, new Date().getTime()*0.001);
+		window.x = e.pageX;
+    window.y = e.pageY;
 
-			if (menu.mode) {
-				menu.move(window.x, window.y);
-			}
-
-			d3.select('.cursor')
-				.attr('cx', window.x)
-				.attr('cy', window.y);
-
-			lastMove = Date.now();
+		if (menu.mode) {
+			menu.move(window.x, window.y);
 		}
+
+		d3.select('.cursor')
+			.attr('cx', window.x)
+			.attr('cy', window.y);
 	});
 
 	$('.trigger')
