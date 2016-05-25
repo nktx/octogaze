@@ -80,6 +80,10 @@ app.get('/result', function(req, res) {
 	res.render('pages/result');
 });
 
+app.get('/proportion-test', function(req, res) {
+	res.render('pages/proportion-test');
+});
+
 app.get('/resample-test', function(req, res) {
 	res.render('pages/resample-test');
 });
