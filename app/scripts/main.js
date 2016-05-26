@@ -89,11 +89,22 @@ Menu = function() {
 		this.mode = true;
 		this.gesturePath = [];
 		this.gesturePath.push(new Point(0, 0));
+		this.cursorPath = [];
+		this.cursorPath.push(new Point(x, y));
 
 		this.startPos = this.prevPos = this.curPos = new Point(x, y);
 
+		canvas
+  		.append('path')
+			.attr({
+				'd': line([this.prevPos, this.curPos]),
+				'stroke': '#EDEDED',
+				'stroke-width': cursorRadius*2,
+				'class': 'gesture'
+			});
+
 		this.realtime	= recognizer.Realtime(this.gesturePath);
-		drawGuidance(this.realtime.Status, this.startPos, this.curPos);
+		drawGuidance(this.realtime.Status, this.startPos, this.curPos, true);
 
 		this.record = new Record(x, y);
 		this.record.record(0, 0);
@@ -103,6 +114,7 @@ Menu = function() {
 		this.curPos = new Point(x, y);
 		this.record.record(x - this.startPos.X, y - this.startPos.Y);
 
+		this.cursorPath.push(new Point(x, y));
     this.gesturePath.push(new Point(x - this.startPos.X, y - this.startPos.Y));
 		this.realtime	= recognizer.Realtime(this.gesturePath);
 
@@ -115,16 +127,12 @@ Menu = function() {
 		});
 		$('#path-status').text(pathStatus);
 
-    canvas
-  		.append('path')
-			.attr({
-				'd': line([this.prevPos, this.curPos]),
-				'stroke': '#EDEDED',
-				'stroke-width': cursorRadius*2,
-				'class': 'gesture'
+    d3.select('.gesture')
+ 			.attr({
+				'd': line(this.cursorPath),
 			});
 
-		drawGuidance(this.realtime.Status, this.startPos, this.curPos);
+		drawGuidance(this.realtime.Status, this.startPos, this.curPos, false);
 
 		this.prevPos = this.curPos;
 	}
@@ -275,7 +283,7 @@ $(function() {
 		);
 });
 
-function drawGuidance(status, start, cur) {
+function drawGuidance(status, start, cur, init) {
 
 	var FillSize = 20;
 	var FillSizeThreshold = 5;
@@ -287,7 +295,7 @@ function drawGuidance(status, start, cur) {
 	var StrokeCapacity = 0.5;
 	var StrokeCapacityThresold = 0.3
 
-	canvas.selectAll('.menu-svg .guidance').remove();
+	var transitionDuration = 50;
 
 	$.each(status, function(index, value) {
 		var offsetX = 0;
@@ -304,81 +312,163 @@ function drawGuidance(status, start, cur) {
 				Y: element.Y + cur.Y - offsetY - (cur.Y - offsetY - start.Y)*index/9
 			};
     })
-		
+
 		if (guide.length >= 5) {
 			if (guidanceMode == 1) {
 				var guide1ffw = guide.slice(0,11);
-				canvas.append('path')
-					.attr({
-						'd': line(guide1ffw),
-						'stroke': value.Color,
-						'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
-						'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
-						'class': 'guidance'
-					});
-				canvas.append('circle')
-					.attr({
-						'cx': guide1ffw.slice(-1)[0].X,
-						'cy': guide1ffw.slice(-1)[0].Y,
-						'r': Math.max(value.Score*(FillSize+FillSizeThreshold)-FillSizeThreshold, 0),
-						'fill': value.Color,
-						'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
-						'class': 'guidance'
-					});
-				canvas.append('text')
-					.attr({
-						'dx': guide1ffw.slice(-1)[0].X,
-						'dy': guide1ffw.slice(-1)[0].Y,
-						'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
-						'class': 'guidance'
-					})
-					.text(value.Name);
-			} else if (guidanceMode == 2) {
-				canvas.append('path')
-					.attr({
-						'd': line(guide),
-						'stroke': value.Color,
-						'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
-						'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
-						'class': 'guidance'
-					});
-
-				if (guide.length >= 10) {
-					canvas.append('circle')
+				if (!init) {
+					d3.select('.path-' + value.Name)
+						.transition()
+						.duration(transitionDuration)
 						.attr({
-							'cx': guide[value.Conjunction-1].X,
-							'cy': guide[value.Conjunction-1].Y,
-							'r': Math.max(value.Score*(FillSize+FillSizeThreshold)-FillSizeThreshold, 0),
-							'fill': value.Color,
-							'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
-							'class': 'guidance'
+							'd': line(guide1ffw),
+							'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
+							'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
 						});
-					canvas.append('text')
+					d3.select('.circle-' + value.Name)
+						.transition()
+						.duration(transitionDuration)
 						.attr({
-							'dx': guide[value.Conjunction-1].X,
-							'dy': guide[value.Conjunction-1].Y,
-							'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
-							'class': 'guidance'
-						})
-						.text(value.Name);
+							'cx': guide1ffw.slice(-1)[0].X,
+							'cy': guide1ffw.slice(-1)[0].Y,
+							'r': Math.max(value.Score*(FillSize+FillSizeThreshold)-FillSizeThreshold, 0),
+							'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
+						});
+					d3.select('.text-' + value.Name)
+						.transition()
+						.duration(transitionDuration)
+						.attr({
+							'dx': guide1ffw.slice(-1)[0].X,
+							'dy': guide1ffw.slice(-1)[0].Y,
+							'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0)
+						});
 				} else {
+					canvas.append('path')
+						.attr({
+							'd': line(guide1ffw),
+							'stroke': value.Color,
+							'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
+							'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
+							'class': 'guidance path-' + value.Name
+						});
 					canvas.append('circle')
 						.attr({
-							'cx': guide.slice(-1)[0].X,
-							'cy': guide.slice(-1)[0].Y,
+							'cx': guide1ffw.slice(-1)[0].X,
+							'cy': guide1ffw.slice(-1)[0].Y,
 							'r': Math.max(value.Score*(FillSize+FillSizeThreshold)-FillSizeThreshold, 0),
 							'fill': value.Color,
 							'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
-							'class': 'guidance'
+							'class': 'guidance circle-' + value.Name
 						});
 					canvas.append('text')
 						.attr({
-							'dx': guide.slice(-1)[0].X,
-							'dy': guide.slice(-1)[0].Y,
+							'dx': guide1ffw.slice(-1)[0].X,
+							'dy': guide1ffw.slice(-1)[0].Y,
 							'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
-							'class': 'guidance'
+							'class': 'guidance text-' + value.Name
 						})
 						.text(value.Name);
+				}
+				
+			} else if (guidanceMode == 2) {
+				if (!init) {
+					d3.select('.path-' + value.Name)
+						.transition()
+						.duration(transitionDuration)
+						.attr({
+							'd': line(guide),
+							'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
+							'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
+						});
+				} else {
+					canvas.append('path')
+						.attr({
+							'd': line(guide),
+							'stroke': value.Color,
+							'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
+							'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
+							'class': 'guidance path-' + value.Name
+						});
+				}
+				
+				if (guide.length >= 10) {
+					if (!init) {
+						d3.select('.circle-' + value.Name)
+							.transition()
+							.duration(transitionDuration)
+							.attr({
+								'cx': guide[value.Conjunction-1].X,
+								'cy': guide[value.Conjunction-1].Y,
+								'r': Math.max(value.Score*(FillSize+FillSizeThreshold)-FillSizeThreshold, 0),
+								'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
+							});
+						d3.select('.text-' + value.Name)
+							.transition()
+							.duration(transitionDuration)
+							.attr({
+								'dx': guide[value.Conjunction-1].X,
+								'dy': guide[value.Conjunction-1].Y,
+								'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
+							})
+							.text(value.Name);
+					} else {
+						canvas.append('circle')
+							.attr({
+								'cx': guide[value.Conjunction-1].X,
+								'cy': guide[value.Conjunction-1].Y,
+								'r': Math.max(value.Score*(FillSize+FillSizeThreshold)-FillSizeThreshold, 0),
+								'fill': value.Color,
+								'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
+								'class': 'guidance circle-' + value.Name
+							});
+						canvas.append('text')
+							.attr({
+								'dx': guide[value.Conjunction-1].X,
+								'dy': guide[value.Conjunction-1].Y,
+								'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
+								'class': 'guidance text-' + value.Name
+							})
+							.text(value.Name);
+					}
+				} else {
+					if (!init) {
+						d3.select('.circle-' + value.Name)
+							.transition()
+							.duration(transitionDuration)
+							.attr({
+								'cx': guide.slice(-1)[0].X,
+								'cy': guide.slice(-1)[0].Y,
+								'r': Math.max(value.Score*(FillSize+FillSizeThreshold)-FillSizeThreshold, 0),
+								'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
+							});
+						d3.select('.text-' + value.Name)
+							.transition()
+							.duration(transitionDuration)
+							.attr({
+								'dx': guide.slice(-1)[0].X,
+								'dy': guide.slice(-1)[0].Y,
+								'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
+							})
+							.text(value.Name);
+					} else {
+						canvas.append('circle')
+							.attr({
+								'cx': guide.slice(-1)[0].X,
+								'cy': guide.slice(-1)[0].Y,
+								'r': Math.max(value.Score*(FillSize+FillSizeThreshold)-FillSizeThreshold, 0),
+								'fill': value.Color,
+								'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
+								'class': 'guidance circle-' + value.Name
+							});
+						canvas.append('text')
+							.attr({
+								'dx': guide.slice(-1)[0].X,
+								'dy': guide.slice(-1)[0].Y,
+								'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
+								'class': 'guidance text-' + value.Name
+							})
+							.text(value.Name);
+					}
 				}
 			}
 		}
