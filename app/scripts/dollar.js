@@ -192,7 +192,7 @@ function DollarRecognizer() // constructor
 
 			perf = Resample(perf, NumPoints);
 			var d = DistanceAtBestAngle(perf, this.Unistrokes[i], -AngleRange, +AngleRange, AnglePrecision);
-			
+
 			var st = {
 				Name: this.Unistrokes[i].Name,
 				Color: this.Unistrokes[i].Color,
@@ -313,12 +313,22 @@ function DollarRecognizer() // constructor
 // Private helper functions from this point down
 //
 function FindCorner(o, r) {
+
+	var x = [];
+
+	for (var k = 1; k < o.length - 1; k++) {
+		var a = FindAngle(o[k-1], o[k], o[k+1])*180/Math.PI;
+		if (a <= 90) {
+			x.push(o[k]);
+		}
+	}
+
 	var c = [];
-	for (var i = 0; i < o.length; i++) {	
+	for (var i = 0; i < x.length; i++) {	
 		var b = +Infinity;
 		var u = -1;
 		for (var j = 0; j < r.length; j++) {
-			var d = Distance(o[i], r[j]);
+			var d = Distance(x[i], r[j]);
 			if (d < b) {
 				b = d;
 				u = j;
@@ -326,7 +336,16 @@ function FindCorner(o, r) {
 		}
 		c.push(u);
 	}
+
+	// console.log(c);
 	return c;
+}
+
+function FindAngle(A,B,C) {
+    var AB = Math.sqrt(Math.pow(B.X-A.X,2)+ Math.pow(B.Y-A.Y,2));    
+    var BC = Math.sqrt(Math.pow(B.X-C.X,2)+ Math.pow(B.Y-C.Y,2)); 
+    var AC = Math.sqrt(Math.pow(C.X-A.X,2)+ Math.pow(C.Y-A.Y,2));
+    return Math.acos((BC*BC+AB*AB-AC*AC)/(2*BC*AB));
 }
 
 function Resample(points, n)
