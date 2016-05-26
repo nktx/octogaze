@@ -90,14 +90,14 @@ Menu = function() {
 
     this.gesturePath.push(new Point(x - this.startPos.X, y - this.startPos.Y));
 
-    canvas
-  		.append('path')
-			.attr({
-				'd': line([this.prevPos, this.curPos]),
-				'stroke': '#EDEDED',
-				'stroke-width': cursorRadius*2,
-				'class': 'gesture'
-			});
+   //  canvas
+  	// 	.append('path')
+			// .attr({
+			// 	'd': line([this.prevPos, this.curPos]),
+			// 	'stroke': '#EDEDED',
+			// 	'stroke-width': cursorRadius*2,
+			// 	'class': 'gesture'
+			// });
 
 		this.prevPos = this.curPos;
 	}
@@ -125,10 +125,10 @@ $(function() {
 	canvas
 		.append('circle')
   	.attr({
-  		'cx': (-1)*cursorRadius,
-  		'cy': (-1)*cursorRadius,
+  		'cx': $(window).width()/2,
+  		'cy': $(window).height()/2,
   		'r': cursorRadius,
-  		'fill': '#EDEDED',
+  		'fill': '#34495E',
   		'class': 'cursor'
   	});
 
@@ -180,9 +180,9 @@ $(function() {
 			menu.move(window.x, window.y);
 		}
 
-		d3.select('.cursor')
-			.attr('cx', window.x)
-			.attr('cy', window.y);
+		// d3.select('.cursor')
+		// 	.attr('cx', window.x)
+		// 	.attr('cy', window.y);
 	});
 
 	$('.trigger')
