@@ -310,8 +310,8 @@ function drawGuidance(status, start, cur, init) {
 
 		var guide = value.Subtract.map(function(element, index){
 			return {
-				X: element.X + cur.X - offsetX - (cur.X - offsetX - start.X)*index/9 ,
-				Y: element.Y + cur.Y - offsetY - (cur.Y - offsetY - start.Y)*index/9
+				X: element.X + cur.X - offsetX - (value.Score)*(cur.X - offsetX - start.X)*index/9 ,
+				Y: element.Y + cur.Y - offsetY - (value.Score)*(cur.Y - offsetY - start.Y)*index/9
 			};
     })
 
