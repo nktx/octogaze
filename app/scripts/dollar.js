@@ -176,6 +176,14 @@ function DollarRecognizer() // constructor
 		for (var i = 0; i < this.Unistrokes.length; i++) {
 			var p = length/PathLength(this.Unistrokes[i].Points);
 			var n = Math.round(this.Unistrokes[i].Points.length * p);
+	
+			var s = n;
+			var e = n + 15;
+			for (j = 0; j < this.Unistrokes[i].Corner.length; j++) {
+				if (s < this.Unistrokes[i].Corner[j] && this.Unistrokes[i].Corner[j] < e) {
+					e = this.Unistrokes[i].Corner[j] + 1;
+				}
+			}
 
 			var remain = this.Unistrokes[i].Points.slice(n, n+15);
 
@@ -189,7 +197,8 @@ function DollarRecognizer() // constructor
 				Name: this.Unistrokes[i].Name,
 				Color: this.Unistrokes[i].Color,
 				Score: 1.0 - d / HalfDiagonal,	
-				Subtract: remain
+				Subtract: remain,
+				Conjunction: Math.min(e-n, 10)
 			};
 
 			status.push(st);
