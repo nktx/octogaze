@@ -291,11 +291,13 @@ function drawGuidance(status, start, cur, init) {
 	var FillCapacityThreshold = 0.3;
 
 	var StrokeWidth = 40;
-	var StrokeWidthThresold = 5;
+	var StrokeWidthThreshold = 5;
 	var StrokeCapacity = 0.5;
-	var StrokeCapacityThresold = 0.3
+	var StrokeCapacityThreshold = 0.3
 
 	var transitionDuration = 50;
+
+	var m = Math.max.apply(Math,status.map(function(o){return o.Score;}));
 
 	$.each(status, function(index, value) {
 		var offsetX = 0;
@@ -322,8 +324,8 @@ function drawGuidance(status, start, cur, init) {
 						.duration(transitionDuration)
 						.attr({
 							'd': line(guide1ffw),
-							'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
-							'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
+							'stroke-width': value.Score*(StrokeWidth+StrokeWidthThreshold)/m-StrokeWidthThreshold +'px',
+							'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThreshold)/m-StrokeCapacityThreshold,
 						});
 					d3.select('.circle-' + value.Name)
 						.transition()
@@ -331,8 +333,8 @@ function drawGuidance(status, start, cur, init) {
 						.attr({
 							'cx': guide1ffw.slice(-1)[0].X,
 							'cy': guide1ffw.slice(-1)[0].Y,
-							'r': Math.max(value.Score*(FillSize+FillSizeThreshold)-FillSizeThreshold, 0),
-							'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
+							'r': Math.max(value.Score*(FillSize+FillSizeThreshold)/m-FillSizeThreshold, 0),
+							'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)/m-FillCapacityThreshold, 0),
 						});
 					d3.select('.text-' + value.Name)
 						.transition()
@@ -340,31 +342,31 @@ function drawGuidance(status, start, cur, init) {
 						.attr({
 							'dx': guide1ffw.slice(-1)[0].X,
 							'dy': guide1ffw.slice(-1)[0].Y,
-							'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0)
+							'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)/m-FillCapacityThreshold, 0)
 						});
 				} else {
 					canvas.append('path')
 						.attr({
 							'd': line(guide1ffw),
 							'stroke': value.Color,
-							'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
-							'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
+							'stroke-width': value.Score*(StrokeWidth+StrokeWidthThreshold)/m-StrokeWidthThreshold +'px',
+							'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThreshold)/m-StrokeCapacityThreshold,
 							'class': 'guidance path-' + value.Name
 						});
 					canvas.append('circle')
 						.attr({
 							'cx': guide1ffw.slice(-1)[0].X,
 							'cy': guide1ffw.slice(-1)[0].Y,
-							'r': Math.max(value.Score*(FillSize+FillSizeThreshold)-FillSizeThreshold, 0),
+							'r': Math.max(value.Score*(FillSize+FillSizeThreshold)/m-FillSizeThreshold, 0),
 							'fill': value.Color,
-							'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
+							'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)/m-FillCapacityThreshold, 0),
 							'class': 'guidance circle-' + value.Name
 						});
 					canvas.append('text')
 						.attr({
 							'dx': guide1ffw.slice(-1)[0].X,
 							'dy': guide1ffw.slice(-1)[0].Y,
-							'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
+							'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)/m-FillCapacityThreshold, 0),
 							'class': 'guidance text-' + value.Name
 						})
 						.text(value.Name);
@@ -377,16 +379,16 @@ function drawGuidance(status, start, cur, init) {
 						.duration(transitionDuration)
 						.attr({
 							'd': line(guide),
-							'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
-							'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
+							'stroke-width': value.Score*(StrokeWidth+StrokeWidthThreshold)/m-StrokeWidthThreshold +'px',
+							'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThreshold)/m-StrokeCapacityThreshold,
 						});
 				} else {
 					canvas.append('path')
 						.attr({
 							'd': line(guide),
 							'stroke': value.Color,
-							'stroke-width': value.Score*(StrokeWidth+StrokeWidthThresold)-StrokeWidthThresold +'px',
-							'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThresold)-StrokeCapacityThresold,
+							'stroke-width': value.Score*(StrokeWidth+StrokeWidthThreshold)/m-StrokeWidthThreshold +'px',
+							'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThreshold)/m-StrokeCapacityThreshold,
 							'class': 'guidance path-' + value.Name
 						});
 				}
@@ -399,8 +401,8 @@ function drawGuidance(status, start, cur, init) {
 							.attr({
 								'cx': guide[value.Conjunction-1].X,
 								'cy': guide[value.Conjunction-1].Y,
-								'r': Math.max(value.Score*(FillSize+FillSizeThreshold)-FillSizeThreshold, 0),
-								'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
+								'r': Math.max(value.Score*(FillSize+FillSizeThreshold)/m-FillSizeThreshold, 0),
+								'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)/m-FillCapacityThreshold, 0),
 							});
 						d3.select('.text-' + value.Name)
 							.transition()
@@ -408,7 +410,7 @@ function drawGuidance(status, start, cur, init) {
 							.attr({
 								'dx': guide[value.Conjunction-1].X,
 								'dy': guide[value.Conjunction-1].Y,
-								'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
+								'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)/m-FillCapacityThreshold, 0),
 							})
 							.text(value.Name);
 					} else {
@@ -416,16 +418,16 @@ function drawGuidance(status, start, cur, init) {
 							.attr({
 								'cx': guide[value.Conjunction-1].X,
 								'cy': guide[value.Conjunction-1].Y,
-								'r': Math.max(value.Score*(FillSize+FillSizeThreshold)-FillSizeThreshold, 0),
+								'r': Math.max(value.Score*(FillSize+FillSizeThreshold)/m-FillSizeThreshold, 0),
 								'fill': value.Color,
-								'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
+								'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)/m-FillCapacityThreshold, 0),
 								'class': 'guidance circle-' + value.Name
 							});
 						canvas.append('text')
 							.attr({
 								'dx': guide[value.Conjunction-1].X,
 								'dy': guide[value.Conjunction-1].Y,
-								'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
+								'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)/m-FillCapacityThreshold, 0),
 								'class': 'guidance text-' + value.Name
 							})
 							.text(value.Name);
@@ -438,8 +440,8 @@ function drawGuidance(status, start, cur, init) {
 							.attr({
 								'cx': guide.slice(-1)[0].X,
 								'cy': guide.slice(-1)[0].Y,
-								'r': Math.max(value.Score*(FillSize+FillSizeThreshold)-FillSizeThreshold, 0),
-								'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
+								'r': Math.max(value.Score*(FillSize+FillSizeThreshold)/m-FillSizeThreshold, 0),
+								'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)/m-FillCapacityThreshold, 0),
 							});
 						d3.select('.text-' + value.Name)
 							.transition()
@@ -447,7 +449,7 @@ function drawGuidance(status, start, cur, init) {
 							.attr({
 								'dx': guide.slice(-1)[0].X,
 								'dy': guide.slice(-1)[0].Y,
-								'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
+								'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)/m-FillCapacityThreshold, 0),
 							})
 							.text(value.Name);
 					} else {
@@ -455,16 +457,16 @@ function drawGuidance(status, start, cur, init) {
 							.attr({
 								'cx': guide.slice(-1)[0].X,
 								'cy': guide.slice(-1)[0].Y,
-								'r': Math.max(value.Score*(FillSize+FillSizeThreshold)-FillSizeThreshold, 0),
+								'r': Math.max(value.Score*(FillSize+FillSizeThreshold)/m-FillSizeThreshold, 0),
 								'fill': value.Color,
-								'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
+								'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)/m-FillCapacityThreshold, 0),
 								'class': 'guidance circle-' + value.Name
 							});
 						canvas.append('text')
 							.attr({
 								'dx': guide.slice(-1)[0].X,
 								'dy': guide.slice(-1)[0].Y,
-								'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)-FillCapacityThreshold, 0),
+								'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)/m-FillCapacityThreshold, 0),
 								'class': 'guidance text-' + value.Name
 							})
 							.text(value.Name);
