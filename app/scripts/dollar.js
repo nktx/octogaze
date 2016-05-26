@@ -198,7 +198,7 @@ function DollarRecognizer() // constructor
 				Color: this.Unistrokes[i].Color,
 				Score: 1.0 - d / HalfDiagonal,	
 				Subtract: remain,
-				Conjunction: Math.min(e-n, 10)
+				Conjunction: Math.min(Math.max((e-n), 5), 10)
 			};
 
 			status.push(st);
