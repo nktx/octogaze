@@ -26,8 +26,13 @@ Record = function(x, y) {
 	this.duration = 0;
 	this.curLength = [];
 	this.startTime = Date.now();
+	this.path = [];
+	this.startPosition = {
+		X: x,
+		Y: y
+	};
 
-	this.record = function(l64, l32, l16, l8, l4) {
+	this.record = function(l64, l32, l16, l8, l4, x, y) {
 		this.curLength.push({
 			'Length64': l64,
 			'Length32': l32,
@@ -35,6 +40,11 @@ Record = function(x, y) {
 			'Length8': l8,
 			'Length4': l4,
 			'Time': Date.now() - this.startTime
+		});
+
+		this.path.push({
+			X: x,
+			Y: y
 		});
 	};
 	
@@ -62,7 +72,7 @@ Menu = function() {
 		this.startPos = this.prevPos = this.curPos = new Point(x, y);
 
 		this.record = new Record(x, y);
-		this.record.record(0, 0);
+		this.record.record(0, 0, 0, 0, 0, 0, 0);
 	};
 
 	this.move = function(x, y) {
@@ -85,7 +95,9 @@ Menu = function() {
 			PathLength(gesturePathCopy32),
 			PathLength(gesturePathCopy16),
 			PathLength(gesturePathCopy8),
-			PathLength(gesturePathCopy4)
+			PathLength(gesturePathCopy4),
+			x - this.startPos.X,
+			y - this.startPos.Y
 		);
 
     this.gesturePath.push(new Point(x - this.startPos.X, y - this.startPos.Y));
