@@ -9,17 +9,17 @@ $(function() {
 			});
 
 	var margin = {top: 30, right: 20, bottom: 30, left: 50},
-	width = 1080 - margin.left - margin.right,
-	height = 460 - margin.top - margin.bottom;
+	width = 580 - margin.left - margin.right,
+	height = 310 - margin.top - margin.bottom;
 
 	var x = d3.scale.linear().range([0, width]).domain([0, width/100]);
 	var y = d3.scale.linear().range([height, 0]).domain([0, height]);
 
 	var xAxis = d3.svg.axis().scale(x)
-	    .orient('bottom').ticks(20);
+				.orient('bottom').ticks(10);
 
 	var yAxis = d3.svg.axis().scale(y)
-	    .orient('left').ticks(5);
+				.orient('left').ticks(5);
 
 	var svg = d3.select('body')
 	    .append('svg')
