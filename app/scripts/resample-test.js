@@ -145,7 +145,7 @@ $(function() {
   		'cx': $(window).width()/2,
   		'cy': $(window).height()/2,
   		'r': cursorRadius,
-  		'fill': '#34495E',
+  		'fill': '#3D3D3D',
   		'class': 'cursor'
   	});
 
