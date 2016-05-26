@@ -473,6 +473,8 @@ function drawGuidance(status, start, cur, init) {
 					}
 				}
 			}
+		} else {
+			d3.selectAll('.menu-svg .guidance').remove();
 		}
 	});	
 }

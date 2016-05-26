@@ -378,6 +378,8 @@ function drawGuidance(status, start, cur, init) {
 						.text(value.Name);
 				}
 			}
+		} else {
+			d3.selectAll('.menu-svg .guidance').remove();
 		}
 	});	
 }
