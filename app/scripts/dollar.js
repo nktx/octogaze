@@ -318,7 +318,7 @@ function FindCorner(o, r) {
 
 	for (var k = 1; k < o.length - 1; k++) {
 		var a = FindAngle(o[k-1], o[k], o[k+1])*180/Math.PI;
-		if (a <= 90) {
+		if (a <= 100) {
 			x.push(o[k]);
 		}
 	}
