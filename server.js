@@ -87,3 +87,7 @@ app.get('/proportion-test', function(req, res) {
 app.get('/resample-test', function(req, res) {
 	res.render('pages/resample-test');
 });
+
+app.get('/resample-result', function(req, res) {
+	res.render('pages/resample-result');
+});
