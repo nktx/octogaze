@@ -48,9 +48,11 @@ Record = function(x, y) {
 		});
 	};
 	
-	this.end = function() {
+	this.end = function(w, h) {
 		this.duration = Date.now() - this.startTime;
 		$('#task-duration').text(this.duration);
+		this.width = w;
+		this.height = h;
 
 		console.log(this);
 		if (recordMode) {
@@ -118,8 +120,11 @@ Menu = function() {
 		this.lock = true;
 		$('.trigger').removeClass('hover');
 
+		var gesturePathCopyb = JSON.parse(JSON.stringify(this.gesturePath));
+		var bbox = BoundingBox(gesturePathCopyb);
+
 		this.mode = false;
-		this.record.end();
+		this.record.end(bbox.Width, bbox.Height);
 
 		d3.selectAll('.menu-svg .guidance').remove();
 		d3.selectAll('.menu-svg .gesture').remove();
