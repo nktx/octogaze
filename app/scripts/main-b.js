@@ -206,6 +206,24 @@ $(function() {
     	guidanceMode = (guidanceMode+1)%2;
     	$('#task-interface').text(modes[guidanceMode]);
     }
+  
+    if (event.keyCode == 38) {
+			var y = parseInt(d3.selectAll('.trigger').attr('y'));
+    	d3.select('.trigger')
+    		.transition()
+    		.attr({
+					'y': y - 50
+    		});
+    }
+
+    if (event.keyCode == 40) {
+			var y = parseInt(d3.selectAll('.trigger').attr('y'));
+    	d3.select('.trigger')
+    		.transition()
+    		.attr({
+					'y': y + 50
+    		});
+    }
 	});
 
 	$(document).keyup(function(event){ 

@@ -243,6 +243,24 @@ $(function() {
 			recognizer.DeleteUserGestures();
     	recognizer.AddGesture(gestures[gestureIndex].Color, gestures[gestureIndex].Name, gestures[gestureIndex].Points);
     }
+
+    if (event.keyCode == 38) {
+			var y = parseInt(d3.selectAll('.trigger').attr('y'));
+    	d3.select('.trigger')
+    		.transition()
+    		.attr({
+					'y': y - 50
+    		});
+    }
+
+    if (event.keyCode == 40) {
+			var y = parseInt(d3.selectAll('.trigger').attr('y'));
+    	d3.select('.trigger')
+    		.transition()
+    		.attr({
+					'y': y + 50
+    		});
+    }
 	});
 
 	$(document).keyup(function(event){ 
