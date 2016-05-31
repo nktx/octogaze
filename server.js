@@ -76,12 +76,10 @@ app.get('/arc', function(req, res) {
 	res.render('pages/arc');
 });
 
-app.get('/result', function(req, res) {
-	res.render('pages/result');
-});
-
-app.get('/proportion-test', function(req, res) {
-	res.render('pages/proportion-test');
+app.get('/result/:type', function(req, res) {
+	res.render('pages/result', {
+		type: req.params.type
+	});
 });
 
 app.get('/resample-test', function(req, res) {

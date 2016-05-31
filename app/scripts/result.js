@@ -56,8 +56,6 @@ $(function() {
 		var offsetX = $(window).width()/2;
 		var offsetY = $(window).height()/2;
 
-		var displayInterface = 'LINE';
-
 		svg
 			.append('circle')
 	  	.attr({
