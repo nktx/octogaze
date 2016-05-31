@@ -51,30 +51,47 @@ $(function() {
 
 	function drawResult(result, strokes){
 
-		var presence = {};
+		var gestureCollection = {};
 
 		var offsetX = $(window).width()/2;
 		var offsetY = $(window).height()/2;
 
-		svg
-			.append('circle')
-	  	.attr({
-	  		'cx': offsetX,
-	  		'cy': offsetY,
-	  		'r': 20,
-	  		'fill': '#F0F1F3',
-	  		'class': 'cursor'
-	  	});
+		var guideColor = {
+			'NOGUIDE': '#F1C40F',
+			'1FFW': '#E74C3C',
+			'2FFW': '#3498DB'
+		};
 
 	  result.forEach(function (data){
-			if ((!presence[data.gesture]) && (data.interface == displayInterface)){
-				presence[data.gesture] = true;
+			if ((!gestureCollection[data.gesture]) && (data.interface == displayInterface)){
+				gestureCollection[data.gesture] = {};
 			}
 	  });
 
-		for (var key in presence) {
+		result.forEach(function (data){
+			if (data.interface == displayInterface) {
+
+				var resizedPath = ScaleTo(data.path, 250);
+				// var translatedPath = resizedPath.map(function(p){		
+				var translatedPath = data.path.map(function(p){
+					return {
+						X: p.X + offsetX,
+						Y: p.Y + offsetY
+					}
+				});
+
+				if (!gestureCollection[data.gesture][data.guide]){
+					gestureCollection[data.gesture][data.guide] = [];
+				}
+
+				gestureCollection[data.gesture][data.guide].push(translatedPath);
+			}
+		});
+
+		// render gesture template
+		for (var gesture in gestureCollection) {
 			for (var i = 0; i < strokes.length; i++) {
-				if (strokes[i].Name == key) {
+				if (strokes[i].Name == gesture) {
 					var translatedTemplate = strokes[i].Points.map(function(p){
 						return {
 							X: p.X + offsetX,
@@ -94,41 +111,33 @@ $(function() {
 			}
 		}
 
-		result.forEach(function (data){
-
-			if (data.interface == displayInterface) {
-				var resizedPath = ScaleTo(data.path, 250);				
-				var translatedPath = resizedPath.map(function(p){
-					return {
-						X: p.X + offsetX,
-						Y: p.Y + offsetY
+		// render gesture paths
+		for (var gesture in gestureCollection) {
+			for (var guide in gestureCollection[gesture]) {
+				var sum = Array.apply(null, Array(64)).map(function() { return {'X': 0, 'Y': 0} });
+				var c = 0;
+				for (var i = 0; i < gestureCollection[gesture][guide].length; i++) {
+					gestureCollection[gesture][guide][i] = Resample(gestureCollection[gesture][guide][i], 64);
+					for (var j = 0; j < gestureCollection[gesture][guide][i].length; j++) {
+						sum[j].X += gestureCollection[gesture][guide][i][j].X;
+						sum[j].Y += gestureCollection[gesture][guide][i][j].Y;		
 					}
-				});
-
-				var pathColor = '';
-
-				if (data.guide == '2FFW') {
-					pathColor = '#3498DB';
-				} else if (data.guide == '1FFW'){
-					pathColor = '#E74C3C';
-				}	else {
-					pathColor = '#F1C40F';
+					c++;
 				}
+				gestureCollection[gesture][guide] = sum.map(function(v){ return {'X': v.X/c, 'Y': v.Y/c };});
 
-				for (var i = 0; i < strokes.length; i++) {
-					if ((data.result == strokes[i].Name) || (data.resultnorotate == strokes[i].Name)) {
-						svg.append('path')
-							.attr({
-								'd': line(translatedPath),
-								'stroke': pathColor,
-								'stroke-width': '1px',
-								'fill': 'none',
-								'class': 'result'
-							});
-					}
-				}
+				svg.append('path')
+						.attr({
+							'd': line(gestureCollection[gesture][guide]),
+							'stroke': guideColor[guide],
+							'stroke-width': '1px',
+							'fill': 'none',
+							'class': 'result'
+						});
 			}
-		});
+		}
+
+		console.log(gestureCollection);
 	}
 
 	socket = io.connect();
