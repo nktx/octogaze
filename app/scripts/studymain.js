@@ -19,7 +19,7 @@ var line = d3.svg.line()
 var recordMode = false;
 var modes = ['NOGUIDE', '1FFW', '2FFW'];
 var guidanceMode = 0;
-var audio = new Audio('assets/pi.ogg');
+var audio = new Audio('/assets/pi.ogg');
 var cursorRadius = 20;
 
 var taskCompleted = 0;
@@ -135,7 +135,7 @@ Menu = function() {
 		this.result = recognizer.RecognizeR(this.gesturePath);
 		this.resultNoRotate = recognizer.RecognizeNoRotate(gesturePathCopy);
 
-		var interface = location.pathname.slice(1);
+		var interface = location.pathname.substr(location.pathname.lastIndexOf('/') + 1);
 
 		if (interface == 'line'){
 			this.record.end(this.resultNoRotate.Name, this.resultNoRotate.Score);

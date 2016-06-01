@@ -18,7 +18,7 @@ var line = d3.svg.line()
 var recordMode = false;
 var modes = ['NOGUIDE', 'GAZEBEACON'];
 var guidanceMode = 0;
-var audio = new Audio('assets/pi.ogg');
+var audio = new Audio('/assets/pi.ogg');
 var cursorRadius = 20;
 
 var taskCompleted = 0;

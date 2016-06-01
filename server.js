@@ -64,20 +64,14 @@ app.get('/gazebeacon', function(req, res) {
 	res.render('pages/gazebeacon');
 });
 
-app.get('/line', function(req, res) {
-	res.render('pages/line');
+app.get('/userstudy/:type', function(req, res) {
+	res.render('pages/userstudy', {
+		type: req.params.type
+	});
 });
 
-app.get('/corner', function(req, res) {
-	res.render('pages/corner');
-});
-
-app.get('/arc', function(req, res) {
-	res.render('pages/arc');
-});
-
-app.get('/result/:type', function(req, res) {
-	res.render('pages/result', {
+app.get('/studyresult/:type', function(req, res) {
+	res.render('pages/studyresult', {
 		type: req.params.type
 	});
 });
