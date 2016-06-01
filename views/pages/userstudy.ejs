@@ -11,7 +11,22 @@
 	<% include ../partials/progress %>
 	<% include ../partials/info %>
 
-	<script> var displayedInterface = '<%= type %>'.toUpperCase(); </script>
+	<script>
+		var displayedInterface = '<%= type %>'.toUpperCase();
+
+		var cb = '<%= cb %>';
+		var m = {
+			'a': 'NOGUIDE',
+			'b': '1FFW',
+			'c': '2FFW'
+		}
+		
+		var modes = [];
+		modes.push(m[cb[0]]);
+		modes.push(m[cb[1]]);
+		modes.push(m[cb[2]]);
+
+	</script>
 
 	<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
 	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>

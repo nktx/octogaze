@@ -17,7 +17,6 @@ var line = d3.svg.line()
 					.interpolate('basis');
 
 var recordMode = false;
-var modes = ['NOGUIDE', '1FFW', '2FFW'];
 var guidanceMode = 0;
 var audio = new Audio('/assets/pi.ogg');
 var cursorRadius = 20;
@@ -25,8 +24,8 @@ var cursorRadius = 20;
 var taskCompleted = 0;
 
 Record = function(x, y) {
-	this.interface = location.pathname.slice(1).toUpperCase();
-	this.guide = $('#task-interface').text();
+	this.interface = displayedInterface;
+	this.guide = $('#task-guide').text();
 	this.gesture = $('#task-gesture').text();
 	this.subject = $('#task-subject').val();
 	this.result = "";
@@ -168,7 +167,9 @@ Menu = function() {
 $(function() {
 
 	var allowed = true;
-	$('#task-interface').text('NOGUIDE');
+
+	guidanceMode = 2;
+	guideSwitch();
 
 	var menu = new Menu();
 
@@ -224,17 +225,15 @@ $(function() {
 
 			// p to switch between guidance techniques
 	    if (event.keyCode == 80) {
-	    	setTaskCounter(0)
-	    	guidanceMode = (guidanceMode+1)%3;
-	    	$('#task-interface').text(modes[guidanceMode]);
+	    	guideSwitch();
 	    }
 
 			// g to switch between gestures
 	    if (event.keyCode == 71) {
 	    	setTaskCounter(0);
 
-				guidanceMode = 0;
-	    	$('#task-interface').text(modes[guidanceMode]);
+				guidanceMode = 2;
+	    	guideSwitch();
 
 	    	gestureIndex = (gestureIndex+1)%(gestures.length);
 	    	$('#task-gesture').text(gestures[gestureIndex].Name);
@@ -301,6 +300,17 @@ $(function() {
 		);
 });
 
+function guideSwitch() {
+	setTaskCounter(0)
+	guidanceMode = (guidanceMode+1)%3;
+
+	if ((displayedInterface !== 'CORNER') && (modes[guidanceMode] == '2FFW')) {
+		guidanceMode = (guidanceMode+1)%3;
+	}
+
+	$('#task-guide').text(modes[guidanceMode]);
+}
+
 function drawGuidance(status, start, cur, init) {
 
 	var FillSize = 20;
@@ -332,11 +342,9 @@ function drawGuidance(status, start, cur, init) {
 				Y: element.Y + cur.Y - offsetY - (value.Score)*(cur.Y - offsetY - start.Y)*index/9
 			};
     })
-		console.log(guide.length);
-		console.log(value.Conjunction);
 
 		if (guide.length >= 4) {
-			if (guidanceMode !== 0) {
+			if (modes[guidanceMode] !== 'NOGUIDE') {
 
 				// common path guidance
 				if (init) {
@@ -360,7 +368,7 @@ function drawGuidance(status, start, cur, init) {
 				}
 
 				// command text and circle guidance
-				if ((guidanceMode == 2 ) && (value.Conjunction < guide.length)) {
+				if ((modes[guidanceMode] == '2FFW') && (value.Conjunction < guide.length)) {
 					if (init) {
 						canvas.append('circle')
 							.attr({

@@ -64,8 +64,9 @@ app.get('/gazebeacon', function(req, res) {
 	res.render('pages/gazebeacon');
 });
 
-app.get('/userstudy/:type', function(req, res) {
+app.get('/userstudy/:cb/:type', function(req, res) {
 	res.render('pages/userstudy', {
+		cb: req.params.cb,
 		type: req.params.type
 	});
 });
