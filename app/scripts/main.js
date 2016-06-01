@@ -31,8 +31,6 @@ Record = function(x, y) {
 	this.subject = $('#task-subject').val();
 	this.result = "";
 	this.score = 0;
-	this.resultnorotate = "";
-	this.scorenorotate = 0;
 	this.duration = 0;
 	this.path = [];
 	this.startTime = Date.now();
@@ -48,28 +46,17 @@ Record = function(x, y) {
 		})
 	};
 	
-	this.end = function(r, s, ru, su) {
+	this.end = function(r, s) {
 		this.duration = Date.now() - this.startTime;
-		this.score = Math.round(s*1000)/1000;
-		this.scorenorotate = Math.round(su*1000)/1000;
 
 		$('#task-duration').text(this.duration);
-
-		if (location.pathname.slice(1) == 'line'){
-			if (su > 0) {
-				this.resultnorotate = ru;
-				$('#task-result').text(this.resultnorotate + '(' + this.scorenorotate + ')');
-			} else {
-				$('#task-result').text('-');
-			}
+	
+		if (s > 0) {
+			this.score = Math.round(s*1000)/1000;
+			this.result = r;
+			$('#task-result').text(this.result + '(' + this.score + ')');
 		} else {
-			if (s > 0) {
-				this.result = r;
-				$('#task-result').text(this.result + '(' + this.score + ')');
-			} else {
-				$('#task-result').text('-');
-			}
-			this.resultnorotate = ru;
+			$('#task-result').text('-');
 		}
 
 		console.log(this);
@@ -147,7 +134,12 @@ Menu = function() {
 
 		this.result = recognizer.RecognizeR(this.gesturePath);
 		this.resultNoRotate = recognizer.RecognizeNoRotate(gesturePathCopy);
-		this.record.end(this.result.Name, this.result.Score, this.resultNoRotate.Name, this.resultNoRotate.Score);
+
+		if (location.pathname.slice(1) == 'line'){
+			this.record.end(this.resultNoRotate.Name, this.resultNoRotate.Score);
+		} else {		
+			this.record.end(this.result.Name, this.result.Score);
+		}
 
 		if (this.result.Score >= 0.75) {
 			d3.selectAll('.menu-svg .guidance').remove();
