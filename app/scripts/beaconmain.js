@@ -24,6 +24,7 @@ var cursorRadius = 20;
 var taskCompleted = 0;
 
 Record = function(x, y) {
+	this.interface = 'EVALUATION'; 
 	this.guide = $('#task-guide').text();
 	this.subject = $('#task-subject').val();
 	this.result = "";
