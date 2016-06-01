@@ -201,64 +201,70 @@ $(function() {
 	recognizer.AddGesture(gestures[gestureIndex].Color, gestures[gestureIndex].Name, gestures[gestureIndex].Points);
 
 	$(document).keydown(function(event){
+		
+		if (!$('#task-subject').is(':focus')) {
+			// avoid keydown event repeated
+			if (event.repeat != undefined) { allowed = !event.repeat; }
+		  if (!allowed) return;
+		  allowed = false;
 
-		// avoid keydown event repeated
-		if (event.repeat != undefined) { allowed = !event.repeat; }
-	  if (!allowed) return;
-	  allowed = false;
+			// space to open menu 
+			if ((event.keyCode == 32) && (menu.lock == false)) { 
+				menu.open(window.x, window.y);
+			}
 
-		if ((event.keyCode == 90) && (menu.lock == false)) { 
-			menu.open(window.x, window.y);
-		}
+			// r to switch between record mode
+	    if (event.keyCode == 82) {
+	    	setTaskCounter(0);
+				recordMode = !recordMode;
+	    	$('#record-mode').text( recordMode ? 'ON' : 'OFF');
+	    }
 
-    if (event.keyCode == 82) {
-    	setTaskCounter(0);
-			recordMode = !recordMode;
-    	$('#record-mode').text( recordMode ? 'ON' : 'OFF');
-    }
+			// p to switch between guidance techniques
+	    if (event.keyCode == 80) {
+	    	setTaskCounter(0)
+	    	guidanceMode = (guidanceMode+1)%3;
+	    	$('#task-interface').text(modes[guidanceMode]);
+	    }
 
-    if (event.keyCode == 80) {
-    	setTaskCounter(0)
-    	guidanceMode = (guidanceMode+1)%3;
-    	$('#task-interface').text(modes[guidanceMode]);
-    }
+			// g to switch between gestures
+	    if (event.keyCode == 71) {
+	    	setTaskCounter(0);
 
-    if (event.keyCode == 71) {
-    	setTaskCounter(0);
+				guidanceMode = 0;
+	    	$('#task-interface').text(modes[guidanceMode]);
 
-			guidanceMode = 0;
-    	$('#task-interface').text(modes[guidanceMode]);
+	    	gestureIndex = (gestureIndex+1)%(gestures.length);
+	    	$('#task-gesture').text(gestures[gestureIndex].Name);
 
-    	gestureIndex = (gestureIndex+1)%(gestures.length);
-    	$('#task-gesture').text(gestures[gestureIndex].Name);
+				recognizer.DeleteUserGestures();
+	    	recognizer.AddGesture(gestures[gestureIndex].Color, gestures[gestureIndex].Name, gestures[gestureIndex].Points);
+	    }
 
-			recognizer.DeleteUserGestures();
-    	recognizer.AddGesture(gestures[gestureIndex].Color, gestures[gestureIndex].Name, gestures[gestureIndex].Points);
-    }
-
-    if (event.keyCode == 38) {
-			var y = parseInt(d3.selectAll('.trigger').attr('y'));
-    	d3.select('.trigger')
-    		.transition()
-    		.attr({
-					'y': y - 50
-    		});
-    }
-
-    if (event.keyCode == 40) {
-			var y = parseInt(d3.selectAll('.trigger').attr('y'));
-    	d3.select('.trigger')
-    		.transition()
-    		.attr({
-					'y': y + 50
-    		});
-    }
+			// push trigger area up up and down 
+	    if (event.keyCode == 38) {
+				var y = parseInt(d3.selectAll('.trigger').attr('y'));
+	    	d3.select('.trigger')
+	    		.transition()
+	    		.attr({
+						'y': y - 50
+	    		});
+	    }
+	    if (event.keyCode == 40) {
+				var y = parseInt(d3.selectAll('.trigger').attr('y'));
+	    	d3.select('.trigger')
+	    		.transition()
+	    		.attr({
+						'y': y + 50
+	    		});
+	    }
+  	}
 	});
 
 	$(document).keyup(function(event){ 
 		allowed = true;
 
-		if ((event.keyCode == 90) && (menu.lock == false)) { 
+		if ((event.keyCode == 32) && (menu.lock == false)) { 
 			menu.close();
 		}
 	});
