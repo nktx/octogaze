@@ -24,7 +24,7 @@ var cursorRadius = 20;
 var taskCompleted = 0;
 
 Record = function(x, y) {
-	this.interface = $('#task-interface').text();
+	this.guide = $('#task-guide').text();
 	this.subject = $('#task-subject').val();
 	this.result = "";
 	this.score = 0;
@@ -45,11 +45,11 @@ Record = function(x, y) {
 	
 	this.end = function(r, s) {
 		this.duration = Date.now() - this.startTime;
-		this.score = Math.round(s*1000)/1000;
-
+		
 		$('#task-duration').text(this.duration);
 
 		if (s > 0) {
+			this.score = Math.round(s*1000)/1000;
 			this.result = r;
 			$('#task-result').text(this.result + '(' + this.score + ')');
 		} else {
@@ -155,7 +155,9 @@ Menu = function() {
 $(function() {
 
 	var allowed = true;
-	$('#task-interface').text('NOGUIDE');
+
+	guidanceMode = 1;
+	guideSwitch();
 
 	var menu = new Menu();
 
@@ -186,50 +188,53 @@ $(function() {
 
 	$(document).keydown(function(event){
 
-		// avoid keydown event repeated
-		if (event.repeat != undefined) { allowed = !event.repeat; }
-	  if (!allowed) return;
-	  allowed = false;
+		if (!$('#task-subject').is(':focus')) {
+			// avoid keydown event repeated
+			if (event.repeat != undefined) { allowed = !event.repeat; }
+		  if (!allowed) return;
+		  allowed = false;
 
-		if ((event.keyCode == 90) && (menu.lock == false)) { 
-			menu.open(window.x, window.y);
-		}
+			// space to open menu 
+			if ((event.keyCode == 32) && (menu.lock == false)) { 
+				menu.open(window.x, window.y);
+			}
 
-    if (event.keyCode == 82) {
-    	setTaskCounter(0);
-			recordMode = !recordMode;
-    	$('#record-mode').text( recordMode ? 'ON' : 'OFF');
-    }
+			// r to switch between record mode
+	    if (event.keyCode == 82) {
+	    	setTaskCounter(0);
+				recordMode = !recordMode;
+	    	$('#record-mode').text( recordMode ? 'ON' : 'OFF');
+	    }
 
-    if (event.keyCode == 80) {
-    	setTaskCounter(0)
-    	guidanceMode = (guidanceMode+1)%2;
-    	$('#task-interface').text(modes[guidanceMode]);
-    }
-  
-    if (event.keyCode == 38) {
-			var y = parseInt(d3.selectAll('.trigger').attr('y'));
-    	d3.select('.trigger')
-    		.transition()
-    		.attr({
-					'y': y - 50
-    		});
-    }
-
-    if (event.keyCode == 40) {
-			var y = parseInt(d3.selectAll('.trigger').attr('y'));
-    	d3.select('.trigger')
-    		.transition()
-    		.attr({
-					'y': y + 50
-    		});
-    }
+			// p to switch between guidance techniques
+	    if (event.keyCode == 80) {
+	    	guideSwitch();
+	    }
+	  
+	  	// push trigger area up up and down
+	    if (event.keyCode == 38) {
+				var y = parseInt(d3.selectAll('.trigger').attr('y'));
+	    	d3.select('.trigger')
+	    		.transition()
+	    		.attr({
+						'y': y - 50
+	    		});
+	    }
+	    if (event.keyCode == 40) {
+				var y = parseInt(d3.selectAll('.trigger').attr('y'));
+	    	d3.select('.trigger')
+	    		.transition()
+	    		.attr({
+						'y': y + 50
+	    		});
+	    }
+  	}
 	});
 
 	$(document).keyup(function(event){ 
 		allowed = true;
 
-		if ((event.keyCode == 90) && (menu.lock == false)) { 
+		if ((event.keyCode == 32) && (menu.lock == false)) { 
 			menu.close();
 		}
 	});
@@ -264,6 +269,12 @@ $(function() {
 		);
 });
 
+function guideSwitch() {
+	setTaskCounter(0)
+	guidanceMode = (guidanceMode+1)%2;
+	$('#task-guide').text(modes[guidanceMode]);
+}
+
 function drawGuidance(status, start, cur, init) {
 
 	var FillSize = 20;
@@ -296,17 +307,8 @@ function drawGuidance(status, start, cur, init) {
 			};
     })
 
-		if ((guidanceMode == 1) && (guide.length >= 5)) {
-			if (!init) {
-				d3.select('.path.' + value.Name)
-					.transition()
-					.duration(transitionDuration)
-					.attr({
-						'd': line(guide),
-						'stroke-width': value.Score*(StrokeWidth+StrokeWidthThreshold)/m-StrokeWidthThreshold +'px',
-						'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThreshold)/m-StrokeCapacityThreshold,
-					});
-			} else {
+		if ((modes[guidanceMode] !== 'NOGUIDE') && (guide.length >= 4)) {
+			if (init) {
 				canvas.append('path')
 					.attr({
 						'd': line(guide),
@@ -315,29 +317,19 @@ function drawGuidance(status, start, cur, init) {
 						'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThreshold)/m-StrokeCapacityThreshold,
 						'class': 'guidance path ' + value.Name
 					});
+			} else {
+				d3.select('.path.' + value.Name)
+					.transition()
+					.duration(transitionDuration)
+					.attr({
+						'd': line(guide),
+						'stroke-width': value.Score*(StrokeWidth+StrokeWidthThreshold)/m-StrokeWidthThreshold +'px',
+						'stroke-opacity': value.Score*(StrokeCapacity+StrokeCapacityThreshold)/m-StrokeCapacityThreshold,
+					});
 			}
-			
-			if (guide.length >= 10) {
-				if (!init) {
-					d3.select('.circle.' + value.Name)
-						.transition()
-						.duration(transitionDuration)
-						.attr({
-							'cx': guide[value.Conjunction-1].X,
-							'cy': guide[value.Conjunction-1].Y,
-							'r': Math.max(value.Score*(FillSize+FillSizeThreshold)/m-FillSizeThreshold, 0),
-							'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)/m-FillCapacityThreshold, 0),
-						});
-					d3.select('.text.' + value.Name)
-						.transition()
-						.duration(transitionDuration)
-						.attr({
-							'dx': guide[value.Conjunction-1].X,
-							'dy': guide[value.Conjunction-1].Y,
-							'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)/m-FillCapacityThreshold, 0),
-						})
-						.text(value.Name);
-				} else {
+
+			if (value.Conjunction < guide.length) {
+				if (init) {
 					canvas.append('circle')
 						.attr({
 							'cx': guide[0].X,
@@ -345,7 +337,7 @@ function drawGuidance(status, start, cur, init) {
 							'r': Math.max(value.Score*(FillSize+FillSizeThreshold)/m-FillSizeThreshold, 0),
 							'fill': value.Color,
 							'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)/m-FillCapacityThreshold, 0),
-							'class': 'guidance circle ' + value.Name
+							'class': 'guidance cirlce ' + value.Name
 						})
 						.transition()
 						.duration(transitionDuration*10)
@@ -366,29 +358,28 @@ function drawGuidance(status, start, cur, init) {
 						.attr({
 							'dx': guide[value.Conjunction-1].X,
 							'dy': guide[value.Conjunction-1].Y,
+						});
+				} else {
+					d3.select('.cirlce.' + value.Name)
+						.transition()
+						.duration(transitionDuration)
+						.attr({
+							'cx': guide[value.Conjunction-1].X,
+							'cy': guide[value.Conjunction-1].Y,
+							'r': Math.max(value.Score*(FillSize+FillSizeThreshold)/m-FillSizeThreshold, 0),
+							'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)/m-FillCapacityThreshold, 0),
+						});
+					d3.select('.text.' + value.Name)
+						.transition()
+						.duration(transitionDuration)
+						.attr({
+							'dx': guide[value.Conjunction-1].X,
+							'dy': guide[value.Conjunction-1].Y,
+							'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)/m-FillCapacityThreshold, 0),
 						});
 				}
 			} else {
-				if (!init) {
-					d3.select('.circle.' + value.Name)
-						.transition()
-						.duration(transitionDuration)
-						.attr({
-							'cx': guide.slice(-1)[0].X,
-							'cy': guide.slice(-1)[0].Y,
-							'r': Math.max(value.Score*(FillSize+FillSizeThreshold)/m-FillSizeThreshold, 0),
-							'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)/m-FillCapacityThreshold, 0),
-						});
-					d3.select('.text.' + value.Name)
-						.transition()
-						.duration(transitionDuration)
-						.attr({
-							'dx': guide.slice(-1)[0].X,
-							'dy': guide.slice(-1)[0].Y,
-							'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)/m-FillCapacityThreshold, 0),
-						})
-						.text(value.Name);
-				} else {
+				if (init) {
 					canvas.append('circle')
 						.attr({
 							'cx': guide[0].X,
@@ -396,7 +387,7 @@ function drawGuidance(status, start, cur, init) {
 							'r': Math.max(value.Score*(FillSize+FillSizeThreshold)/m-FillSizeThreshold, 0),
 							'fill': value.Color,
 							'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)/m-FillCapacityThreshold, 0),
-							'class': 'guidance circle ' + value.Name
+							'class': 'guidance cirlce ' + value.Name
 						})
 						.transition()
 						.duration(transitionDuration*10)
@@ -418,7 +409,25 @@ function drawGuidance(status, start, cur, init) {
 							'dx': guide.slice(-1)[0].X,
 							'dy': guide.slice(-1)[0].Y,
 						});
-				}
+				} else {
+					d3.select('.cirlce.' + value.Name)
+						.transition()
+						.duration(transitionDuration)
+						.attr({
+							'cx': guide.slice(-1)[0].X,
+							'cy': guide.slice(-1)[0].Y,
+							'r': Math.max(value.Score*(FillSize+FillSizeThreshold)/m-FillSizeThreshold, 0),
+							'fill-opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)/m-FillCapacityThreshold, 0),
+						});
+					d3.select('.text.' + value.Name)
+						.transition()
+						.duration(transitionDuration)
+						.attr({
+							'dx': guide.slice(-1)[0].X,
+							'dy': guide.slice(-1)[0].Y,
+							'opacity': Math.max(value.Score*(FillCapacity+FillCapacityThreshold)/m-FillCapacityThreshold, 0)
+						});
+				} 
 			}
 		} else {
 			d3.selectAll('.menu-svg .' + value.Name).remove();
