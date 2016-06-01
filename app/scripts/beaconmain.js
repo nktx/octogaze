@@ -21,12 +21,13 @@ var guidanceMode = 0;
 var audio = new Audio('/assets/pi.ogg');
 var cursorRadius = 20;
 
-var taskCompleted = 0;
+var task;
 
 Record = function(x, y) {
 	this.interface = 'EVALUATION'; 
 	this.guide = $('#task-guide').text();
 	this.subject = $('#task-subject').val();
+	this.task = '';
 	this.result = "";
 	this.score = 0;
 	this.duration = 0;
@@ -46,6 +47,8 @@ Record = function(x, y) {
 	
 	this.end = function(r, s) {
 		this.duration = Date.now() - this.startTime;
+		this.task = task.name;
+		console.log(task.name);
 		
 		$('#task-duration').text(this.duration);
 
@@ -60,7 +63,8 @@ Record = function(x, y) {
 		console.log(this);
 		if (recordMode) {
 			socket.emit('record', this);
-			setTaskCounter(1);
+			task.commit();
+			task.assign();
 		}
 	};
 };
@@ -70,6 +74,7 @@ Menu = function() {
 	this.mode = false;
 	
 	this.open = function(x, y) {
+		$('#task-assignment').hide();
 		this.lock = false;
 		this.mode = true;
 		this.gesturePath = [];
@@ -123,6 +128,7 @@ Menu = function() {
 	}
 	
 	this.close = function() {
+		$('#task-assignment').show();
 		this.lock = true;
 		$('.trigger').removeClass('hover');
 
@@ -153,14 +159,56 @@ Menu = function() {
 
 };
 
+Task = function() {
+
+	var taskspool = [];
+
+	for (var i = 0; i < recognizer.Unistrokes.length; i++) {
+		taskspool.push(recognizer.Unistrokes[i].Name);
+	}
+
+	this.tasks = JSON.parse(JSON.stringify(taskspool.sort(function(){return Math.round(Math.random());})));
+
+	this.name = '';
+	this.count = 0;
+	this.lock = false;
+
+	this.assign = function() {
+		this.name = this.tasks.pop();
+		if (this.name) {
+			$('#task-gesture').text(this.name);
+		} else {
+			$('#task-gesture').text('')
+				.addClass('none');
+			this.lock = true;
+		}
+	};
+
+	this.commit = function() {
+		this.count++;
+		$('.progress').css('width', Math.min(100, this.count*100/taskspool.length) + '%');
+	}
+
+	this.reset = function() {
+		this.name = '';
+		this.count = 0;
+		this.lock = false;
+		this.tasks = JSON.parse(JSON.stringify(taskspool.sort(function(){return Math.round(Math.random());})));
+		$('#task-gesture').text('');
+		$('.progress').css('width', '0%');
+	}
+
+};
+
 $(function() {
 
 	var allowed = true;
 
+	var menu = new Menu();
+	task = new Task();
+
 	guidanceMode = 1;
 	guideSwitch();
-
-	var menu = new Menu();
 
 	canvas
 		.append('circle')
@@ -196,15 +244,20 @@ $(function() {
 		  allowed = false;
 
 			// space to open menu 
-			if ((event.keyCode == 32) && (menu.lock == false)) { 
+			if ((event.keyCode == 32) && (!menu.lock) && (!task.lock)) { 
 				menu.open(window.x, window.y);
 			}
 
 			// r to switch between record mode
 	    if (event.keyCode == 82) {
-	    	setTaskCounter(0);
+	    	task.reset();
 				recordMode = !recordMode;
 	    	$('#record-mode').text( recordMode ? 'ON' : 'OFF');
+	    	if (recordMode) {
+					task.assign();
+				} else {
+					task.reset();
+				}
 	    }
 
 			// p to switch between guidance techniques
@@ -235,7 +288,7 @@ $(function() {
 	$(document).keyup(function(event){ 
 		allowed = true;
 
-		if ((event.keyCode == 32) && (menu.lock == false)) { 
+		if ((event.keyCode == 32) && (!menu.lock) && (!task.lock)) { 
 			menu.close();
 		}
 	});
@@ -271,7 +324,10 @@ $(function() {
 });
 
 function guideSwitch() {
-	setTaskCounter(0)
+	task.reset();
+	if (recordMode) {
+		task.assign();
+	}
 	guidanceMode = (guidanceMode+1)%2;
 	$('#task-guide').text(modes[guidanceMode]);
 }
@@ -434,13 +490,4 @@ function drawGuidance(status, start, cur, init) {
 			d3.selectAll('.menu-svg .' + value.Name).remove();
 		}
 	});	
-}
-
-function setTaskCounter(p) {
-	if (p == 0) {
-		taskCompleted = 0;
-	} else {
-		taskCompleted += p;
-	}
-	$('.progress').css('width', Math.min(100, taskCompleted*20) + '%');
 }
