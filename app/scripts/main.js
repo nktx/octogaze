@@ -135,13 +135,15 @@ Menu = function() {
 		this.result = recognizer.RecognizeR(this.gesturePath);
 		this.resultNoRotate = recognizer.RecognizeNoRotate(gesturePathCopy);
 
-		if (location.pathname.slice(1) == 'line'){
+		var interface = location.pathname.slice(1);
+
+		if (interface == 'line'){
 			this.record.end(this.resultNoRotate.Name, this.resultNoRotate.Score);
 		} else {		
 			this.record.end(this.result.Name, this.result.Score);
 		}
 
-		if (this.result.Score >= 0.75) {
+		if ((this.result.Score >= 0.75) && (interface !== 'line')){
 			d3.selectAll('.menu-svg .guidance').remove();
 			d3.selectAll('.menu-svg .gesture')
 				.attr({
