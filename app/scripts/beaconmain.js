@@ -48,7 +48,6 @@ Record = function(x, y) {
 	this.end = function(r, s) {
 		this.duration = Date.now() - this.startTime;
 		this.task = task.name;
-		console.log(task.name);
 		
 		$('#task-duration').text(this.duration);
 
