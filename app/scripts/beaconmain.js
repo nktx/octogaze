@@ -176,9 +176,10 @@ Task = function() {
 		this.name = this.tasks.pop();
 		if (this.name) {
 			$('#task-gesture').text(this.name);
+			$('#task-assignment').text(this.name);
 		} else {
-			$('#task-gesture').text('')
-				.addClass('none');
+			$('#task-gesture').text('');
+			$('#task-assignment').text('');
 			this.lock = true;
 		}
 	};
@@ -194,6 +195,7 @@ Task = function() {
 		this.lock = false;
 		this.tasks = JSON.parse(JSON.stringify(taskspool.sort(function(){return Math.round(Math.random());})));
 		$('#task-gesture').text('');
+		$('#task-assignment').text('');
 		$('.progress').css('width', '0%');
 	}
 
@@ -208,6 +210,19 @@ $(function() {
 
 	guidanceMode = 1;
 	guideSwitch();
+
+	canvas
+  	.append('text')
+		.attr({
+  		'dx': $(window).width()/2,
+  		'dy': $(window).height()/2,
+  		'width': 200,
+  		'height': 200, 
+  		'fill': '#EDEDED',
+    	'pointer-events': 'all',
+  		'id': 'task-assignment'
+  	})
+  	.text('');
 
 	canvas
 		.append('circle')
