@@ -161,7 +161,7 @@ Menu = function() {
 Task = function() {
 
 	var taskspool = [];
-	var round = 5;
+	var round = 10;
 
 	for (var i = 0; i < round; i++) {
 		for (var j = 0; j < recognizer.Unistrokes.length; j++) {
