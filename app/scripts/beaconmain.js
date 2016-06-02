@@ -161,9 +161,12 @@ Menu = function() {
 Task = function() {
 
 	var taskspool = [];
+	var round = 5;
 
-	for (var i = 0; i < recognizer.Unistrokes.length; i++) {
-		taskspool.push(recognizer.Unistrokes[i].Name);
+	for (var i = 0; i < round; i++) {
+		for (var j = 0; j < recognizer.Unistrokes.length; j++) {
+		taskspool.push(recognizer.Unistrokes[j].Name);
+		}
 	}
 
 	this.tasks = JSON.parse(JSON.stringify(taskspool.sort(function(){return Math.round(Math.random());})));
